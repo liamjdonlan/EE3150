@@ -44,33 +44,17 @@ def envelope(t, t_a=0.01, tau_d=0.15):
     return np.where(t < t_a, t/t_a, np.exp(-(t-t_a)/tau_d))
 
 tone_pure = additive(t, f0, pure, fs) 
-tone_pure_envelope = tone_pure / np.max(np.abs(tone_pure)) * envelope(t) #normalize to [-1, 1], multiply by envelope
-tone_pure_click = tone_pure / np.max(np.abs(tone_pure)) * envelope(t, t_a=0) #normalize to [-1, 1], multiply by envelope with no rise
 
 tone_odd_1k = additive(t, f0, odd_1k, fs)
-tone_odd_1k_envelope = tone_odd_1k / np.max(np.abs(tone_odd_1k)) * envelope(t) #normalize to [-1, 1], multiply by envelope
-tone_odd_1k_click = tone_odd_1k / np.max(np.abs(tone_odd_1k)) * envelope(t, t_a=0) #normalize to [-1, 1], envelope with no rise
 
 tone_all_1k = additive(t, f0, all_1k, fs)
 tone_all_1k_envelope = tone_all_1k / np.max(np.abs(tone_all_1k)) * envelope(t) #normalize to [-1, 1], multiply by envelope
 tone_all_1k_click = tone_all_1k / np.max(np.abs(tone_all_1k)) * envelope(t, t_a=0) #normalize to [-1, 1], envelope with no rise
 
 tone_all_1k2 = additive(t, f0, all_1k2, fs)
-tone_all_1k2_envelope = tone_all_1k2 / np.max(np.abs(tone_all_1k2)) * envelope(t) #normalize to [-1, 1], multiply by envelope
-tone_all_1k2_click = tone_all_1k2 / np.max(np.abs(tone_all_1k2)) * envelope(t, t_a=0) #normalize to [-1, 1], envelope with no rise
 
-#Write tones to files to playback and compare
-tones = {
-    "pure_envelope":    tone_pure_envelope,
-    "pure_click":       tone_pure_click,
-    "odd_1k_envelope":  tone_odd_1k_envelope,
-    "odd_1k_click":     tone_odd_1k_click,
-    "all_1k_envelope":  tone_all_1k_envelope,
-    "all_1k_click":     tone_all_1k_click,
-    "all_1k2_envelope": tone_all_1k2_envelope,
-    "all_1k2_click":    tone_all_1k2_click,
-}
+all_1k_envelope_i16 = np.int16(tone_all_1k_envelope * 32767) # converts to 16 bit int for wav format
+wavfile.write("all_1k_envelope.wav", round(fs), all_1k_envelope_i16) # writes the wav file to disk
 
-for name, tone in tones.items():
-    tone_i16 = np.int16(tone * 32767) # converts to 16 bit int for wav format
-    wavfile.write(f"{name}.wav", round(fs), tone_i16) # writes the wav file to disk
+all_1k_click_i16 = np.int16(tone_all_1k_click * 32767) # converts to 16 bit int for wav format
+wavfile.write("all_1k_click.wav", round(fs), all_1k_click_i16) # writes the wav file to disk

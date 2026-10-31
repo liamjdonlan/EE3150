@@ -51,7 +51,6 @@
 
 \subsubsection*{Code}
 \addcontentsline{toc}{subsubsection}{Code}
-\todo{Add Code}
 
 \begin{minted}[
     frame=single,
@@ -60,12 +59,130 @@
     breaklines,
     breakanywhere
     ]{python}
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.io import wavfile
 
+fs = 8192
+f0 = 220.0
+t = np.arange(0, 2.0, 1.0/fs)
+
+# Build a periodic tone. amps[m] is the amplitude of the (m+1)-th harmonic
+def additive(t, f0, amps, fs):
+
+    x = np.zeros_like(t)
+    for m in range(len(amps)):
+        k = m + 1
+        if k*f0 < fs/2:
+            x = x + amps[m] * np.sin(2 * np.pi * k * f0 * t) # Complete: add the k-th harmonic, see Eq. (1) of the manual
+    return x
+
+# only the fundamental is nonzero
+pure = np.zeros(20)
+pure[0] = 1
+
+# odd harmonics with amplitude 1/k, even harmonics 0
+odd_1k = np.zeros(20)
+for i in range(len(odd_1k)):
+    k = i + 1
+    if k % 2 != 0:
+        odd_1k[i] = float(1/k)
+
+# all harmonics with amplitude 1/k 
+all_1k = np.zeros(20)
+for i in range(len(all_1k)):
+    k = i + 1
+    all_1k[i] = float(1/k)
+
+# all harmonics with amplitude 1/k**2
+all_1k2 = np.zeros(20)
+for i in range(len(all_1k2)):
+    k = i + 1
+    all_1k2[i] = float((1/k) ** 2)
+
+tone_pure = additive(t, f0, pure, fs) 
+tone_pure = tone_pure / np.max(np.abs(tone_pure)) #normalize to [-1, 1]
+
+tone_odd_1k = additive(t, f0, odd_1k, fs)
+tone_odd_1k = tone_odd_1k / np.max(np.abs(tone_odd_1k)) #normalize to [-1, 1]
+
+tone_all_1k = additive(t, f0, all_1k, fs)
+tone_all_1k = tone_all_1k / np.max(np.abs(tone_all_1k)) #normalize to [-1, 1]
+
+tone_all_1k2 = additive(t, f0, all_1k2, fs)
+tone_all_1k2 = tone_all_1k2 / np.max(np.abs(tone_all_1k2)) #normalize to [-1, 1]
+
+#Write tones to files to playback and compare
+pure_i16 = np.int16(tone_pure / np.max(np.abs(tone_pure)) * 32767) # converts to 16 bit int for wav format
+fname = "pure.wav"
+wavfile.write(fname, round(fs), pure_i16) # writes the wav file to disk
+
+odd_1k_i16 = np.int16(tone_odd_1k / np.max(np.abs(tone_odd_1k)) * 32767) # converts to 16 bit int for wav format
+fname = "odd_1k.wav"
+wavfile.write(fname, round(fs), odd_1k_i16) # writes the wav file to disk
+
+all_1k_i16 = np.int16(tone_all_1k / np.max(np.abs(tone_all_1k)) * 32767) # converts to 16 bit int for wav format
+fname = "all_1k.wav"
+wavfile.write(fname, round(fs), all_1k_i16) # writes the wav file to disk
+
+all_1k2_i16 = np.int16(tone_all_1k2 / np.max(np.abs(tone_all_1k2)) * 32767) # converts to 16 bit int for wav format
+fname = "all_1k2.wav"
+wavfile.write(fname, round(fs), all_1k2_i16) # writes the wav file to disk
+
+# Create k-axis to plot magnitudes against
+k = np.arange(1, 21)
+
+# plot A_k as a function of k for each tone
+fig1, ax1 = plt.subplots(2, 2, sharex=True, sharey=True, figsize = (10, 7))
+
+fig1.suptitle('A_k as a function of k for each tone')
+
+ax1[0, 0].stem(k, pure)
+ax1[0, 0].set_title('Pure Tone Coefficients')
+ax1[0, 1].stem(k, odd_1k)
+ax1[0, 1].set_title(r'Odd Coefficient Magnitudes = $1/k$')
+ax1[1, 0].stem(k, all_1k)
+ax1[1, 0].set_title(r'All Coefficient Magnitudes = $1/k$')
+ax1[1, 1].stem(k, all_1k2)
+ax1[1, 1].set_title(r'All Coefficient Magnitudes = $1/k^2$')
+fig1.supxlabel('k')
+fig1.supylabel('magnitude')
+fig1.tight_layout
+
+fig2, ax2 = plt.subplots(figsize=(10, 5))
+
+ax2.plot(t, tone_pure, label='Pure')
+ax2.plot(t, tone_odd_1k, label=r'Odd = $1/k$')
+ax2.plot(t, tone_all_1k, label=r'All = $1/k$')
+ax2.plot(t, tone_all_1k2, label=r'All = $1/k^2$')
+
+ax2.set_xlim(0, 1/f0)
+ax2.set_title('Tones (1 period, normalized)')
+ax2.set_xlabel('t (s)')
+ax2.set_ylabel('amplitude')
+ax2.legend()
+
+fig2.tight_layout()
+
+plt.show()
 \end{minted}
 
 \subsection*{Plots}
 \addcontentsline{toc}{subsubsection}{Plots}
-\todo{Add Graphs}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Lab_4/Latex/Graphs/A_k_vs_k.png}
+    \caption{\(A_k\) as a Function of k for Each Tone}
+    \label{fig:A_k_vs_k}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Lab_4/Latex/Graphs/Tones.png}
+    \caption{Graph of One Normalized Period of All Tones}
+    \label{fig:tones}
+\end{figure}
 
 \subsection*{Brightness Comment}
 \addcontentsline{toc}{subsubsection}{Brightness Comment}
@@ -80,7 +197,6 @@
 
 \subsubsection*{Code}
 \addcontentsline{toc}{subsubsection}{Code}
-\todo{Add Code}
 
 \begin{minted}[
     frame=single,
@@ -89,7 +205,82 @@
     breaklines,
     breakanywhere
     ]{python}
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.io import wavfile
 
+fs = 8192
+f0 = 220.0
+t = np.arange(0, 2.0, 1.0/fs)
+
+# Build a periodic tone. amps[m] is the amplitude of the (m+1)-th harmonic
+def additive(t, f0, amps, fs):
+
+    x = np.zeros_like(t)
+    for m in range(len(amps)):
+        k = m + 1
+        if k*f0 < fs/2:
+            x = x + amps[m] * np.sin(2 * np.pi * k * f0 * t) # Complete: add the k-th harmonic, see Eq. (1) of the manual
+    return x
+
+# only the fundamental is nonzero
+pure = np.zeros(20)
+pure[0] = 1
+
+# odd harmonics with amplitude 1/k, even harmonics 0
+odd_1k = np.zeros(20)
+for i in range(len(odd_1k)):
+    k = i + 1
+    if k % 2 != 0:
+        odd_1k[i] = float(1/k)
+
+# all harmonics with amplitude 1/k 
+all_1k = np.zeros(20)
+for i in range(len(all_1k)):
+    k = i + 1
+    all_1k[i] = float(1/k)
+
+# all harmonics with amplitude 1/k**2
+all_1k2 = np.zeros(20)
+for i in range(len(all_1k2)):
+    k = i + 1
+    all_1k2[i] = float((1/k) ** 2)
+
+def envelope(t, t_a=0.01, tau_d=0.15):
+    # returns t/t_a during the rise (t < t_a), exp decay afterwards
+    return np.where(t < t_a, t/t_a, np.exp(-(t-t_a)/tau_d))
+
+tone_pure = additive(t, f0, pure, fs) 
+tone_pure_envelope = tone_pure / np.max(np.abs(tone_pure)) * envelope(t) #normalize to [-1, 1], multiply by envelope
+tone_pure_click = tone_pure / np.max(np.abs(tone_pure)) * envelope(t, t_a=0) #normalize to [-1, 1], multiply by envelope with no rise
+
+tone_odd_1k = additive(t, f0, odd_1k, fs)
+tone_odd_1k_envelope = tone_odd_1k / np.max(np.abs(tone_odd_1k)) * envelope(t) #normalize to [-1, 1], multiply by envelope
+tone_odd_1k_click = tone_odd_1k / np.max(np.abs(tone_odd_1k)) * envelope(t, t_a=0) #normalize to [-1, 1], envelope with no rise
+
+tone_all_1k = additive(t, f0, all_1k, fs)
+tone_all_1k_envelope = tone_all_1k / np.max(np.abs(tone_all_1k)) * envelope(t) #normalize to [-1, 1], multiply by envelope
+tone_all_1k_click = tone_all_1k / np.max(np.abs(tone_all_1k)) * envelope(t, t_a=0) #normalize to [-1, 1], envelope with no rise
+
+tone_all_1k2 = additive(t, f0, all_1k2, fs)
+tone_all_1k2_envelope = tone_all_1k2 / np.max(np.abs(tone_all_1k2)) * envelope(t) #normalize to [-1, 1], multiply by envelope
+tone_all_1k2_click = tone_all_1k2 / np.max(np.abs(tone_all_1k2)) * envelope(t, t_a=0) #normalize to [-1, 1], envelope with no rise
+
+#Write tones to files to playback and compare
+tones = {
+    "pure_envelope":    tone_pure_envelope,
+    "pure_click":       tone_pure_click,
+    "odd_1k_envelope":  tone_odd_1k_envelope,
+    "odd_1k_click":     tone_odd_1k_click,
+    "all_1k_envelope":  tone_all_1k_envelope,
+    "all_1k_click":     tone_all_1k_click,
+    "all_1k2_envelope": tone_all_1k2_envelope,
+    "all_1k2_click":    tone_all_1k2_click,
+}
+
+for name, tone in tones.items():
+    tone_i16 = np.int16(tone * 32767) # converts to 16 bit int for wav format
+    wavfile.write(f"{name}.wav", round(fs), tone_i16) # writes the wav file to disk
 \end{minted}
 
 \subsubsection*{Description \& Explanation}
@@ -101,7 +292,6 @@
 
 \subsubsection*{Code}
 \addcontentsline{toc}{subsubsection}{Code}
-\todo{Add Code}
 
 \begin{minted}[
     frame=single,
@@ -111,6 +301,44 @@
     breakanywhere
     ]{python}
 
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.io import wavfile
+
+fs = 8192
+
+# Build a periodic tone. amps[m] is the amplitude of the (m+1)-th harmonic
+def additive(t, f0, amps, fs):
+
+    x = np.zeros_like(t)
+    for m in range(len(amps)):
+        k = m + 1
+        if k*f0 < fs/2:
+            x = x + amps[m] * np.sin(2 * np.pi * k * f0 * t) # Complete: add the k-th harmonic, see Eq. (1) of the manual
+    return x
+
+def envelope(t, t_a=0.01, tau_d=0.15):
+    # returns t/t_a during the rise (t < t_a), exp decay afterwards
+    return np.where(t < t_a, t/t_a, np.exp(-(t-t_a)/tau_d))
+
+freqs = {"C4":261.63, "D4":293.66, "E4":329.63, "F4":349.23, "G4":392.00, "A4":440.00}
+
+song = [("C4",0.5),("C4",0.5),("G4",0.5),("G4",0.5),("A4",0.5),("A4",0.5),("G4",1.0),("F4",0.5),("F4",0.5),("E4",0.5),("E4",0.5),("D4",0.5),("D4",0.5),("C4",1.0)]
+my_amps = [1, 1.3, 1, 0.9, 0, 0.65, 0.6]
+
+
+clip = []
+for name, duration in song:
+    tn = np.arange(0, duration, 1.0/fs)
+    note = additive(tn, freqs[name], my_amps, fs)
+
+    clip.append(note * envelope(tn))
+
+clip = np.concatenate(clip)
+clip = clip/np.max(np.abs(clip))
+clip_i16 = np.int16(clip * 32767) # converts to 16 bit int for wav format
+wavfile.write("clip.wav", round(fs), clip_i16) # writes the wav file to disk
 \end{minted}
 
 \subsubsection*{Comment}
@@ -124,8 +352,6 @@
 \addcontentsline{toc}{subsection}{Task 2.1}
 
 \subsubsection*{Code}
-
-\todo{Add Code}
 \addcontentsline{toc}{subsubsection}{Code}
 
 \begin{minted}[
@@ -135,7 +361,56 @@
     breaklines,
     breakanywhere
     ]{python}
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.io import wavfile
 
+A = 1.0
+f0 = 10.0
+w0 = 2*np.pi*f0
+T0 = 1.0/f0
+
+def xtilde(t, N):
+    x = np.zeros_like(t)
+    for n in range(1, N+1):
+        k = 2*n- 1
+        x = x + 1/k * np.sin(k * w0 * t)
+    return x * (4 * A)/np.pi
+
+
+def square_wave(t, T):
+    sq = np.zeros_like(t)
+    for i in range(len(t)):
+        rem = t[i] % T
+        if rem < T/2:
+            sq[i] = A
+        else: 
+            sq[i] = -A
+
+    return sq
+
+t = np.arange(-0.25*T0, 1.25*T0, T0/10000)
+
+N = [1, 3, 7, 49, 199]
+
+fig1, ax1 = plt.subplots(figsize=(10, 5))
+
+for n in N:
+    ax1.plot(t, xtilde(t, n), label=f'xtilde with N = {n}')
+
+peak_N49 = np.max(xtilde(t, 49))
+peak_N199 = np.max(xtilde(t, 199))
+
+ax1.plot(t, square_wave(t, T0), label='Ideal square wave')
+
+ax1.set_xlim(-0.25 * T0, 1.25 * T0)
+ax1.set_title('Truncated Square Wave Plot, with Approximations')
+ax1.set_xlabel('t (s)')
+ax1.set_ylabel('amplitude')
+ax1.legend()
+
+fig1.tight_layout()
+plt.show()
 \end{minted}
 
 \subsubsection*{Partial Sum Plot}

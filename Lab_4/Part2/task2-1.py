@@ -45,7 +45,7 @@ ax1.axhline(peak_N199, linestyle='--', color='blue', label=f'N=199 peak = {peak_
 ax1.plot(t, square_wave(t, T0), label='Ideal square wave')
 
 ax1.set_xlim(-0.25 * T0, 1.25 * T0)
-ax1.set_title('Truncated Square Wave Plot, with Approximations')
+ax1.set_title('Square Wave Plot, with Truncated Approximations')
 ax1.set_xlabel('t (s)')
 ax1.set_ylabel('amplitude')
 ax1.legend()

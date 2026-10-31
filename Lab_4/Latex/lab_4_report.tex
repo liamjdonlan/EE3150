@@ -233,8 +233,8 @@ all_1k_click_i16 = np.int16(tone_all_1k_click * 32767) # converts to 16 bit int 
 wavfile.write("all_1k_click.wav", round(fs), all_1k_click_i16) # writes the wav file to disk
 \end{minted}
 
-\subsubsection*{Description \& Explanation}
-\addcontentsline{toc}{subsubsection}{Description \& Explanation}
+\subsubsection*{Comparison}
+\addcontentsline{toc}{subsubsection}{Comparison}
 Although the \texttt{all\_1k} tone is multiplied by two different envelopes, one with a gradual rise and one without, both resultant tones sound the same, and no click is audible, as the original tone is built entirely of unshifted sine waves, so the tone starts with zero amplitude for both envelopes.
 
 \subsection*{Task 1.3}
@@ -361,11 +361,16 @@ plt.show()
 
 \subsubsection*{Partial Sum Plot}
 \addcontentsline{toc}{subsubsection}{Partial Sum Plot}
-\todo{Add Graph}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Lab_4/Latex/Graphs/figure2.1_partial_sums.png}
+    \caption{Square wave plot, with truncated approximations for $N = 1, 3, 7, 49, 199$} over 1.5 periods.
+    \label{fig:truncated_square}
+\end{figure}
 
-\subsubsection*{Overshoot Measurement, Behavior, and Explanation}
-\addcontentsline{toc}{subsubsection}{Overshoot Measurement, Behavior, and Explanation}
-\todo{Add Overshoot Measurement, Behavior, and Explanation}
+\subsubsection*{Overshoot Measurement and Behavior}
+\addcontentsline{toc}{subsubsection}{Overshoot Measurement and Behavior}
+For a $N=49$, the peak value just after the jump is $1.1790$, exceeding $A=1$ by \SI{17.9}{\percent}, while for $N=199$, the peak value just after the jump is $1.1778$, exceeding $A=1$ by \SI{17.78}{\percent}. For both cases, the exceeded percentage is approximately the same, even though over four times as many harmonics were used for $N=199$. This shows the difficulty of representing a discontinuous signal with a finite number of harmonics, as it will not be possible to perfectly approximate the discontinuities.
 
 \subsection*{Task 2.2}
 \addcontentsline{toc}{subsection}{Task 2.2}
@@ -442,7 +447,7 @@ plt.show()
 \todo{Add LTI-vs-nonlinear Contrast}
 
 \section*{Conclusion}
-\addcontentsline{toc}{section}{Introduction}
+\addcontentsline{toc}{section}{Conclusion}
 \todo{Add Conclusion}
 
 \end{document}

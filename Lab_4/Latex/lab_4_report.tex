@@ -177,6 +177,17 @@ plt.show()
     \label{fig:A_k_vs_k}
 \end{figure}
 
+\subsection*{Brightness and Hollowness}
+\begin{description}
+  \item[\texttt{pure}:] Only the fundamental is nonzero, so there is no higher-frequency content. It sounds the least bright of the four, with a very smooth but dull overall sound.
+  \item[\texttt{odd\_1k}:] Only the odd harmonics are nonzero, with amplitudes decaying as $1/k$. It sounds very bright, and also the hollowest of the four.
+
+  \item[\texttt{all\_1k}:] All harmonics are present, with amplitudes decaying as $1/k$. It sounds bright, but with a fuller sound compared to odd\_1k.
+  \item[\texttt{all\_1k2}:] All harmonics are present, but the amplitudes decay as $1/k^2$, so the higher harmonics die out much sooner. It sounds mellower than the $1/k$ tones.
+\end{description}
+
+The brightest tones are the ones whose harmonic amplitudes decay as $1/k$ (\texttt{odd\_1k} and \texttt{all\_1k}), because they contain more high-frequency content. The pure tone has no high-frequency content, and in \texttt{all\_1k2} the $1/k^2$ decay makes the higher harmonics fall off much faster. Hollowness is more of a result of the harmonic pattern: the hollowest tone, \texttt{odd\_1k}, has only odd harmonics. Generally, tones built from only odd harmonics sound hollower than other tones (such as square waves).
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{Lab_4/Latex/Graphs/Tones.png}
@@ -184,13 +195,15 @@ plt.show()
     \label{fig:tones}
 \end{figure}
 
-\subsection*{Brightness Comment}
-\addcontentsline{toc}{subsubsection}{Brightness Comment}
-\todo{Add Brightness Comment}
+\subsection*{Tone Shape}
+\begin{description}
+  \item[\texttt{pure}:] The \texttt{pure} tone looks like an ordinary sine wave, since it is built from the fundamental alone with no additional frequency content.
+  \item[\texttt{odd\_1k}:] The \texttt{odd\_1k} tone looks like a square wave. This matches the Fourier series of a square wave, whose coefficients are zero for even harmonics and proportional to $1/k$ for odd harmonics.
+  \item[\texttt{all\_1k}:] The \texttt{all\_1k} tone looks like a sawtooth wave, consistent with the Fourier series of a sawtooth, whose coefficients are proportional to $1/k$ for all harmonics $k \geq 1$.
+  \item[\texttt{all\_1k2}:] The \texttt{all\_1k2} waveform appears to lie between a sawtooth and a pure sine wave, just as the magnitude plot of its coefficients lies between those of the sawtooth tone (\texttt{all\_1k}) and the pure tone (\texttt{pure}).
+\end{description}
 
-\subsection*{Pattern Comment}
-\addcontentsline{toc}{subsubsection}{Pattern Comment}
-\todo{Add Pattern Comment}
+The pattern of coefficients determines the waveform's shape in two ways. First, which harmonics are present sets the overall profile: odd harmonics alone produce a square wave, while all harmonics with the same $1/k$ decay produce a sawtooth. Second, how fast the coefficient decays determines how sharp the features of the waveform are, with faster decaying coefficient leading to a smoother, more sine-like waveform. 
 
 \subsection*{Task 1.2}
 \addcontentsline{toc}{subsection}{Task 1.2}
@@ -205,87 +218,24 @@ plt.show()
     breaklines,
     breakanywhere
     ]{python}
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.io import wavfile
-
-fs = 8192
-f0 = 220.0
-t = np.arange(0, 2.0, 1.0/fs)
-
-# Build a periodic tone. amps[m] is the amplitude of the (m+1)-th harmonic
-def additive(t, f0, amps, fs):
-
-    x = np.zeros_like(t)
-    for m in range(len(amps)):
-        k = m + 1
-        if k*f0 < fs/2:
-            x = x + amps[m] * np.sin(2 * np.pi * k * f0 * t) # Complete: add the k-th harmonic, see Eq. (1) of the manual
-    return x
-
-# only the fundamental is nonzero
-pure = np.zeros(20)
-pure[0] = 1
-
-# odd harmonics with amplitude 1/k, even harmonics 0
-odd_1k = np.zeros(20)
-for i in range(len(odd_1k)):
-    k = i + 1
-    if k % 2 != 0:
-        odd_1k[i] = float(1/k)
-
-# all harmonics with amplitude 1/k 
-all_1k = np.zeros(20)
-for i in range(len(all_1k)):
-    k = i + 1
-    all_1k[i] = float(1/k)
-
-# all harmonics with amplitude 1/k**2
-all_1k2 = np.zeros(20)
-for i in range(len(all_1k2)):
-    k = i + 1
-    all_1k2[i] = float((1/k) ** 2)
-
 def envelope(t, t_a=0.01, tau_d=0.15):
     # returns t/t_a during the rise (t < t_a), exp decay afterwards
     return np.where(t < t_a, t/t_a, np.exp(-(t-t_a)/tau_d))
-
-tone_pure = additive(t, f0, pure, fs) 
-tone_pure_envelope = tone_pure / np.max(np.abs(tone_pure)) * envelope(t) #normalize to [-1, 1], multiply by envelope
-tone_pure_click = tone_pure / np.max(np.abs(tone_pure)) * envelope(t, t_a=0) #normalize to [-1, 1], multiply by envelope with no rise
-
-tone_odd_1k = additive(t, f0, odd_1k, fs)
-tone_odd_1k_envelope = tone_odd_1k / np.max(np.abs(tone_odd_1k)) * envelope(t) #normalize to [-1, 1], multiply by envelope
-tone_odd_1k_click = tone_odd_1k / np.max(np.abs(tone_odd_1k)) * envelope(t, t_a=0) #normalize to [-1, 1], envelope with no rise
 
 tone_all_1k = additive(t, f0, all_1k, fs)
 tone_all_1k_envelope = tone_all_1k / np.max(np.abs(tone_all_1k)) * envelope(t) #normalize to [-1, 1], multiply by envelope
 tone_all_1k_click = tone_all_1k / np.max(np.abs(tone_all_1k)) * envelope(t, t_a=0) #normalize to [-1, 1], envelope with no rise
 
-tone_all_1k2 = additive(t, f0, all_1k2, fs)
-tone_all_1k2_envelope = tone_all_1k2 / np.max(np.abs(tone_all_1k2)) * envelope(t) #normalize to [-1, 1], multiply by envelope
-tone_all_1k2_click = tone_all_1k2 / np.max(np.abs(tone_all_1k2)) * envelope(t, t_a=0) #normalize to [-1, 1], envelope with no rise
+all_1k_envelope_i16 = np.int16(tone_all_1k_envelope * 32767) # converts to 16 bit int for wav format
+wavfile.write("all_1k_envelope.wav", round(fs), all_1k_envelope_i16) # writes the wav file to disk
 
-#Write tones to files to playback and compare
-tones = {
-    "pure_envelope":    tone_pure_envelope,
-    "pure_click":       tone_pure_click,
-    "odd_1k_envelope":  tone_odd_1k_envelope,
-    "odd_1k_click":     tone_odd_1k_click,
-    "all_1k_envelope":  tone_all_1k_envelope,
-    "all_1k_click":     tone_all_1k_click,
-    "all_1k2_envelope": tone_all_1k2_envelope,
-    "all_1k2_click":    tone_all_1k2_click,
-}
-
-for name, tone in tones.items():
-    tone_i16 = np.int16(tone * 32767) # converts to 16 bit int for wav format
-    wavfile.write(f"{name}.wav", round(fs), tone_i16) # writes the wav file to disk
+all_1k_click_i16 = np.int16(tone_all_1k_click * 32767) # converts to 16 bit int for wav format
+wavfile.write("all_1k_click.wav", round(fs), all_1k_click_i16) # writes the wav file to disk
 \end{minted}
 
 \subsubsection*{Description \& Explanation}
 \addcontentsline{toc}{subsubsection}{Description \& Explanation}
-\todo{Add Description and Explination}
+Although the \texttt{all\_1k} tone is multiplied by two different envelopes, one with a gradual rise and one without, both resultant tones sound the same, and no click is audible, as the original tone is built entirely of unshifted sine waves, so the tone starts with zero amplitude for both envelopes.
 
 \subsection*{Task 1.3}
 \addcontentsline{toc}{subsection}{Task 1.3}
@@ -300,8 +250,6 @@ for name, tone in tones.items():
     breaklines,
     breakanywhere
     ]{python}
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
@@ -310,7 +258,6 @@ fs = 8192
 
 # Build a periodic tone. amps[m] is the amplitude of the (m+1)-th harmonic
 def additive(t, f0, amps, fs):
-
     x = np.zeros_like(t)
     for m in range(len(amps)):
         k = m + 1
@@ -327,7 +274,6 @@ freqs = {"C4":261.63, "D4":293.66, "E4":329.63, "F4":349.23, "G4":392.00, "A4":4
 song = [("C4",0.5),("C4",0.5),("G4",0.5),("G4",0.5),("A4",0.5),("A4",0.5),("G4",1.0),("F4",0.5),("F4",0.5),("E4",0.5),("E4",0.5),("D4",0.5),("D4",0.5),("C4",1.0)]
 my_amps = [1, 1.3, 1, 0.9, 0, 0.65, 0.6]
 
-
 clip = []
 for name, duration in song:
     tn = np.arange(0, duration, 1.0/fs)
@@ -341,9 +287,9 @@ clip_i16 = np.int16(clip * 32767) # converts to 16 bit int for wav format
 wavfile.write("clip.wav", round(fs), clip_i16) # writes the wav file to disk
 \end{minted}
 
-\subsubsection*{Comment}
-\addcontentsline{toc}{subsubsection}{Comment}
-\todo{Add Comment}
+\subsubsection*{Description}
+\addcontentsline{toc}{subsubsection}{Description}
+The instrument's harmonic amplitudes $A_k$ were taken from a recording of an A3 (\SI{220}{\hertz}) note played on a piano. The resulting timbre does not sound that much like a piano, though it does have a pleasant timbre. The melody is still recognizable, as musical pitches all correspond to distinct fundamental frequencies, and playing back tones with specific fundamental frequencies for specified durations allows one to reconstruct most melodies.
 
 \section*{Part 2}
 \addcontentsline{toc}{section}{Part 2}

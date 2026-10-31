@@ -1,0 +1,397 @@
+% ==========================================================
+% EE 3150: Signals and Systems -- Lab 4 Report Template
+% Fourier Series, Filtering, and Distortion
+% ==========================================================
+% Grading (52 pts): Intro 1 | Part 1: 15 | Part 2: 14 | Part 3: 15
+%                   Conclusion 4 | Figure style 3
+% Submit ONE typed PDF per team via Brightspace.
+% Handwritten derivations may be scanned (see \includegraphics hints).
+% ==========================================================
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue]{hyperref}
+
+% ---------- Code listing style ----------
+\lstdefinestyle{pycode}{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue!70!black},
+  commentstyle=\color{green!40!black},
+  stringstyle=\color{red!60!black},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  frame=single,
+  breaklines=true,
+  showstringspaces=false
+}
+\lstset{style=pycode}
+
+% ---------- Handy macros ----------
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}   % delete before submitting
+\newcommand{\Hjw}{H(j\omega)}
+\newcommand{\Hjk}{H(jk\omega_0)}
+\newcommand{\figplaceholder}[1]{%
+  \fbox{\parbox{0.9\linewidth}{\centering\vspace{1.2cm}#1\vspace{1.2cm}}}}
+
+\title{\textbf{EE 3150: Signals and Systems}\\[4pt] Lab 4: Fourier Series, Filtering, and Distortion}
+\author{Colden Briggs \and Eben Radocchia \and Liam Donlan\\[4pt]}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+% ==========================================================
+\section{Introduction}  % [1 pt]
+% ==========================================================
+\todo{State the objective of the lab in a short paragraph: how Fourier-series
+coefficients determine signal shape and sound (Part~1); what an LTI system does
+to the coefficients (Part~2); what a nonlinear system does to them (Part~3).}
+
+% ==========================================================
+\section{Part 1 --- Building Instruments from Fourier Coefficients}  % [15 pts]
+% ==========================================================
+
+\subsection{Task 1.1 --- Musical Tones with Different Timbre}  % [7 pts]
+
+\paragraph{Completed code} (3 pts) Include the completed \texttt{additive}
+function and the four coefficient lists.
+\begin{lstlisting}
+import numpy as np
+import matplotlib.pyplot as plt
+
+fs = 8192
+f0 = 220.0
+t = np.arange(0, 2.0, 1.0/fs)
+
+def additive(t, f0, amps, fs):
+    x = np.zeros_like(t)
+    for m in range(len(amps)):
+        k = m + 1
+        if k*f0 < fs/2:
+            x = x + ...   # TODO
+    return x
+
+pure    = ...  # TODO
+odd_1k  = ...  # TODO
+all_1k  = ...  # TODO
+all_1k2 = ...  # TODO
+\end{lstlisting}
+
+\paragraph{Stem plots of $A_k$ and brightness comments} (1 pt plot + 1 pt comment)
+\begin{figure}[H]
+  \centering
+  \figplaceholder{Stem plots of $A_k$ vs.\ $k$ for the four tones\\
+  \texttt{\textbackslash includegraphics[width=\textbackslash linewidth]\{fig\_stems.pdf\}}}
+  \caption{Harmonic amplitudes $A_k$ for the four tones.}
+  \label{fig:stems}
+\end{figure}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Pure tone:} \todo{one-line comment on brightness}
+  \item \textbf{Odd $1/k$:} \todo{comment}
+  \item \textbf{All $1/k$:} \todo{comment}
+  \item \textbf{All $1/k^2$:} \todo{comment}
+\end{itemize}
+\todo{Explain the trend: which harmonic content makes a tone bright, which makes it hollow or dull?}
+
+\paragraph{One period of each tone} (1 pt plot + 1 pt pattern)
+\begin{figure}[H]
+  \centering
+  \figplaceholder{One period of each tone, normalized to unit amplitude, same axes}
+  \caption{One period of each tone (normalized to unit amplitude).}
+  \label{fig:periods}
+\end{figure}
+\todo{Explain how the coefficient pattern defines the shape; which profile looks
+like a square wave and which like a sawtooth?}
+
+\subsection{Task 1.2 --- Envelope}  % [4 pts]
+
+\paragraph{Completed code} (2 pts)
+\begin{lstlisting}
+def envelope(t, t_a=0.01, tau_d=0.15):
+    return ...  # TODO
+\end{lstlisting}
+
+\paragraph{Click description and explanation} (2 pts)
+\todo{Describe the audible difference between $t_a = 10$~ms and $t_a = 0$ for the
+\texttt{all\_1k} tone, and explain why the abrupt onset produces a click
+(think: discontinuity $\Rightarrow$ high-frequency content).}
+
+\subsection{Task 1.3 --- Play a Melody}  % [4 pts]
+
+\paragraph{Completed code} (3 pts)
+\begin{lstlisting}
+freqs = {"C4":261.63, "D4":293.66, "E4":329.63,
+         "F4":349.23, "G4":392.00, "A4":440.00}
+song = [("C4",0.5),("C4",0.5),("G4",0.5),("G4",0.5),("A4",0.5),("A4",0.5),
+        ("G4",1.0),("F4",0.5),("F4",0.5),("E4",0.5),("E4",0.5),("D4",0.5),
+        ("D4",0.5),("C4",1.0)]
+
+my_amps = ...  # TODO
+clip = []
+for name, duration in song:
+    tn = np.arange(0, duration, 1.0/fs)
+    note = ...  # TODO
+    clip.append(...)  # TODO
+clip = np.concatenate(clip)
+clip = clip/np.max(np.abs(clip))
+# play clip at fs
+\end{lstlisting}
+
+\paragraph{Comment} (1 pt)
+\todo{State which instrument ($A_k$) you used and explain in one line why the
+melody is still recognizable.}
+
+% ==========================================================
+\section{Part 2 --- Filtering the Square Wave through the RC Network}  % [14 pts]
+% ==========================================================
+
+\subsection{Task 2.1 --- The Truncated Square Wave and the Gibbs Phenomenon}  % [4 pts]
+
+\paragraph{Completed code} (1 pt)
+\begin{lstlisting}
+A = 1.0
+f0 = 10.0
+w0 = 2*np.pi*f0
+T0 = 1.0/f0
+
+def xtilde(t, N):
+    x = np.zeros_like(t)
+    for n in range(1, N+1):
+        k = 2*n - 1
+        x = x + ...  # TODO
+    return x
+
+t = np.arange(-0.25*T0, 1.25*T0, T0/10000)
+# TODO: plot xtilde(t,N) for N in [1,3,7,49] and the ideal square wave
+\end{lstlisting}
+
+\paragraph{Partial-sum plot} (1 pt)
+\begin{figure}[H]
+  \centering
+  \figplaceholder{$\tilde{x}_N(t)$ for $N=1,3,7,49$ with ideal square wave}
+  \caption{Partial sums $\tilde{x}_N(t)$ of the square wave ($A=1$, $f_0=10$~Hz).}
+  \label{fig:gibbs}
+\end{figure}
+
+\paragraph{Overshoot measurement and explanation} (2 pts)
+\begin{center}
+\begin{tabular}{@{}ccc@{}}
+\toprule
+$N$ & Peak value after jump & Overshoot above $A=1$ (\%) \\
+\midrule
+49  & \todo{} & \todo{} \\
+199 & \todo{} & \todo{} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\todo{Does the percentage shrink or stay roughly the same as $N$ grows? What does
+this say about representing a discontinuous signal with finitely many harmonics?}
+
+\subsection{Task 2.2 --- Filtering the Square Wave Using an RC Circuit}  % [10 pts]
+
+\paragraph{Frequency response derivation} (1 pt)
+Given $h(t) = \dfrac{G}{\tau_1-\tau_2}\left(e^{-t/\tau_1}-e^{-t/\tau_2}\right)u(t)$
+with $\tau_1 = 10$~ms, $\tau_2 = 4.7$~ms, $G = 5.7$:
+\begin{align}
+\Hjw &= \int_{-\infty}^{\infty} h(\tau)\,e^{-j\omega\tau}\,d\tau \nonumber\\
+     &= \todo{show steps} \nonumber\\
+     &= \frac{G}{(1+j\omega\tau_1)(1+j\omega\tau_2)}.
+\end{align}
+
+\paragraph{Magnitude, phase, and comparison with Lab 3} (1 pt)
+\begin{align}
+|\Hjw| &= \todo{} , &
+\angle \Hjw &= \todo{} .
+\end{align}
+\todo{Compare with Lab 3 and explain why they agree.}
+
+\paragraph{Fourier-series output code} (2 pts)
+\begin{lstlisting}
+tau1, tau2, G = 10e-3, 4.7e-3, 5.7
+
+def H(f):
+    jw = 1j*2*np.pi*f
+    return ...  # TODO
+
+def y_fs(t, f0, N=99):
+    w0 = 2*np.pi*f0; y = np.zeros_like(t)
+    for k in range(1, 2*N, 2):
+        Hk = H(k*f0)
+        # TODO: compute the k-th harmonic of the output
+        y = y + ...  # TODO
+    return y
+\end{lstlisting}
+
+\paragraph{Convolution output code and overlay} (2 pts)
+\begin{lstlisting}
+def y_conv(f0, dt=5e-5):
+    nper = 6
+    t = np.arange(0, nper/f0, dt)
+    x = np.sign(np.sin(2*np.pi*f0*t)); x[x == 0] = 1
+    th = np.arange(0, 12*tau1, dt)
+    h = ...   # TODO
+    yc = ...  # TODO: np.convolve(...)*dt, keep first len(t) samples
+    return t, yc
+\end{lstlisting}
+
+\begin{figure}[H]
+  \centering
+  \figplaceholder{Overlay of Fourier-series output and convolution output ($f_0=10$~Hz)}
+  \caption{Fourier-series output vs.\ convolution output at $f_0 = 10$~Hz.
+  The two agree once the initial transient has decayed.}
+  \label{fig:overlay}
+\end{figure}
+
+\paragraph{Plots for $f_0 \in \{2, 10, 40\}$~Hz} (2 pts)
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.9\linewidth}
+    \centering
+    \figplaceholder{$f_0 = 2$~Hz: input and output, two periods}
+    \caption{$f_0 = 2$~Hz}
+  \end{subfigure}\\[6pt]
+  \begin{subfigure}[b]{0.9\linewidth}
+    \centering
+    \figplaceholder{$f_0 = 10$~Hz}
+    \caption{$f_0 = 10$~Hz}
+  \end{subfigure}\\[6pt]
+  \begin{subfigure}[b]{0.9\linewidth}
+    \centering
+    \figplaceholder{$f_0 = 40$~Hz}
+    \caption{$f_0 = 40$~Hz}
+  \end{subfigure}
+  \caption{Square-wave input and filtered output over two periods.}
+  \label{fig:threef0}
+\end{figure}
+
+\paragraph{Mathematical explanation} (2 pts)
+\begin{center}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+$f_0$ (Hz) & $|H(j\omega_0)|$ & $|H(j3\omega_0)|$ & $|H(j5\omega_0)|$ \\
+\midrule
+2  & \todo{} & \todo{} & \todo{} \\
+10 & \todo{} & \todo{} & \todo{} \\
+40 & \todo{} & \todo{} & \todo{} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\todo{For each $f_0$, explain which harmonics pass and which are attenuated, and how
+that determines the output shape.}
+
+\paragraph{Frequencies present in the output}
+\todo{State which frequencies appear in the output relative to the input. This
+statement will be tested against a nonlinear system in Part~3.}
+
+% ==========================================================
+\section{Part 3 --- Nonlinear Distortion}  % [15 pts]
+% ==========================================================
+
+\subsection{Task 3.1 --- The Clipped Waveform}  % [3 pts]
+Parameters: $A=1$, $f_0 = 220$~Hz, $f_s = 44\,100$~Hz.
+
+\begin{figure}[H]
+  \centering
+  \figplaceholder{One period of clipped sine for $L/A \in \{0.9, 0.5, 0.2\}$ with unclipped sine}
+  \caption{Clipped sine $y(t)=\texttt{clip}(A\sin\omega_0 t,-L,L)$ for three clip levels.}
+  \label{fig:clipped}
+\end{figure}
+\todo{Describe how the waveform changes as $L$ decreases. What shape does $y(t)/L$
+approach as $L/A\to 0$?}
+
+\subsection{Task 3.2 --- Analytical Fourier Coefficients of the Clipped Sine}  % [6 pts]
+Let $\theta=\omega_0 t$ and $\theta_c=\arcsin(L/A)$. For odd $k$,
+\begin{equation}
+C_k = \frac{4}{\pi}\int_0^{\pi/2} y(\theta)\sin(k\theta)\,d\theta .
+\end{equation}
+
+\paragraph{Derivation (3 pts)} Split the integral at $\theta_c$.
+\begin{align}
+C_k &= \frac{4}{\pi}\left[\underbrace{\int_0^{\theta_c} A\sin\theta\,\sin k\theta\,d\theta}_{I_1}
+      + \underbrace{\int_{\theta_c}^{\pi/2} L\sin k\theta\,d\theta}_{I_2}\right] \nonumber\\
+\intertext{Using $\sin\theta\sin k\theta = \tfrac12[\cos((k-1)\theta)-\cos((k+1)\theta)]$
+and $\cos(k\pi/2)=0$ for odd $k$:}
+I_1 &= \todo{} \nonumber\\
+I_2 &= \todo{} \nonumber
+\end{align}
+\todo{Or include a scanned handwritten derivation:
+\texttt{\textbackslash includegraphics[width=\textbackslash linewidth]\{derivation.pdf\}}}
+
+\paragraph{Final closed-form expressions (3 pts)}
+\begin{align}
+C_1 &= \todo{} \\
+C_k &= \todo{}, \qquad k\ge 3 \text{ odd.}
+\end{align}
+
+\subsection{Task 3.3 --- Effect of Clip Severity}  % [3 pts]
+
+\paragraph{Code (1 pt)}
+\begin{lstlisting}
+def clip_Ck(k, A, L):
+    # handle k == 1 separately
+    return ...  # TODO
+\end{lstlisting}
+
+\paragraph{Severity plot and description (1 pt)}
+\begin{figure}[H]
+  \centering
+  \figplaceholder{$|C_k|$ vs.\ odd $k$ (up to 13) for $L/A \in \{0.9,0.5,0.2\}$}
+  \caption{Harmonic magnitudes of the clipped sine for three clip levels.}
+  \label{fig:Ck}
+\end{figure}
+\todo{Describe how the harmonic content changes as the clip deepens.}
+
+\paragraph{Limiting cases (1 pt)}
+\begin{enumerate}[label=(\arabic*)]
+  \item $L/A\to 1$: $C_k \to \todo{}$; in particular $C_1\to \todo{}$.
+  \item $L/A\to 0$: $C_k/L \to \todo{}$. This is the harmonic series of a
+        \todo{waveform name}; it arises because \todo{explain from the shape in Task~3.1}.
+\end{enumerate}
+
+\subsection{Task 3.4 --- Listen, and Contrast with Filtering}  % [3 pts]
+
+\paragraph{Audio (1 pt)}
+\todo{Describe the clean vs.\ clipped tone synthesis ($f=220$~Hz, $A=1$, $L/A=0.5$,
+envelope applied to both, $f_s=44\,100$~Hz, $\tau_d$ value used).}
+
+\paragraph{What you hear}
+\todo{Describe how the clipped tone sounds compared with the clean one and
+connect it to the harmonics in Task~3.3.}
+
+\paragraph{LTI vs.\ nonlinear (2 pts)}
+\todo{In 2--3 sentences: state precisely what an LTI system does to the harmonics
+of a periodic input, what a nonlinear system does, and why only one of the two can
+produce frequencies absent from the input.}
+
+% ==========================================================
+\section{Conclusion}  % [4 pts]
+% ==========================================================
+\todo{Summarize the lab and highlight what you learned.}
+
+\paragraph{Take-away messages}
+\begin{enumerate}
+  \item \todo{}
+  \item \todo{}
+  \item \todo{}
+  \item \todo{}
+\end{enumerate}
+
+% ==========================================================
+\appendix
+\section{Complete Python Code (optional)}
+% ==========================================================
+% To include your script directly:
+% \lstinputlisting{lab4.py}
+
+\end{document}

@@ -72,7 +72,9 @@ wavfile.write(fname, round(fs), all_1k2_i16) # writes the wav file to disk
 k = np.arange(1, 21)
 
 # plot A_k as a function of k for each tone
-fig1, ax1 = plt.subplots(2, 2, sharex=True, sharey=True, figsize = (10, 7), label='A_k as a function of k for each tone')
+fig1, ax1 = plt.subplots(2, 2, sharex=True, sharey=True, figsize = (10, 7))
+
+fig1.suptitle('A_k as a function of k for each tone')
 
 ax1[0, 0].stem(k, pure)
 ax1[0, 0].set_title('Pure Tone Coefficients')

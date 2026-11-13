@@ -1,0 +1,75 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.io import wavfile
+
+# Define constants
+fs = 44100
+W = 2000
+f1 = 6000
+f2 = 12000
+
+def plot_spectrum(x, fs, fmax, title):
+    # Magnitude spectrum of x versus frequency in Hz, up to fmax.
+    N = len(x)
+    X = np.abs(np.fft.rfft(x * np.hanning(N)))
+    f = np.fft.rfftfreq(N, 1.0 / fs)
+    X = X / np.max(X)
+    keep = f <= fmax
+    plt.figure(figsize=(7, 3))
+    plt.plot(f[keep], X[keep], lw=0.8)
+    plt.xlabel("frequency (Hz)"); plt.ylabel("|X| (normalized)")
+    plt.title(title); plt.tight_layout(); plt.savefig(title.replace(" ", "_")) # Line modified to save fig instead of plotting it
+
+def ideal_lowpass(x, fs, cutoff):
+    # Ideal low-pass that removes every frequency component above 'cutoff' in Hz
+    X = np.fft.rfft(x)
+    f = np.fft.rfftfreq(len(x), 1.0 / fs)
+    X[f > cutoff] = 0.0
+    return np.fft.irfft(X, n=len(x))
+
+# Task 1.1
+sr1, m1raw = wavfile.read("clip1.wav"); m1raw = m1raw.astype(float);
+if m1raw.ndim > 1: m1raw = m1raw.mean(axis=1)
+sr2, m2raw = wavfile.read("clip2.wav"); m2raw = m2raw.astype(float);
+if m2raw.ndim > 1: m2raw = m2raw.mean(axis=1)
+N = min(len(m1raw), len(m2raw)); m1raw, m2raw = m1raw[:N], m2raw[:N]
+t = np.arange(N) / fs
+
+# Show raw waveform graphs
+plot_spectrum(m1raw, fs, 8000, "Clip 1 Raw Waveform")
+plot_spectrum(m2raw, fs, 8000, "Clip 2 Raw Waveform")
+
+# Band-limit each message to [0, W] using ideal_lowpass and normalize each by its peak magnitude
+m1 = ideal_lowpass(m1raw, fs, W)
+
+m1 = m1 / np.max(np.abs(m1))
+m2 = ideal_lowpass(m2raw, fs, W)
+
+m2 = m2 / np.max(np.abs(m2))
+
+# Show each spectrum after band-limiting
+plot_spectrum(m1, fs, 8000, "Clip 1 Band-Limited Waveform")
+plot_spectrum(m2, fs, 8000, "Clip 2 Band-Limited Waveform")
+
+# Save Band-Limited Waveforms
+m1_i16 = np.int16(m1 * 32767)
+wavfile.write("band-limited_clip1.wav", round(fs), m1_i16)
+m2_i16 = np.int16(m2 * 32767)
+wavfile.write("band-limited_clip2.wav", round(fs), m2_i16)
+
+# Task 1.2
+# Define carriers
+t = np.arange(len(m1)) / fs
+c1 = m1 * np.cos(2 * np.pi * f1 * t)
+
+t = np.arange(len(m2)) / fs
+c2 = m1 * np.cos(2 * np.pi * f2 * t)
+
+# Plot x(t)
+x = c1 + c2
+plot_spectrum(x, fs, 20000, "Transmitted Signal x(t) Waveform")
+
+# Task 2.1
+t = np.arange(len(x)) / fs
+r1 = x * np.cos(2 * np.pi * f1 * t)
+plot_spectrum(r1, fs, 20000, "Received Signal r(t) Waveform")

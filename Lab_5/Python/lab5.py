@@ -28,6 +28,7 @@ def ideal_lowpass(x, fs, cutoff):
     return np.fft.irfft(X, n=len(x))
 
 # Task 1.1
+# Read .wav files
 sr1, m1raw = wavfile.read("clip1.wav"); m1raw = m1raw.astype(float);
 if m1raw.ndim > 1: m1raw = m1raw.mean(axis=1)
 sr2, m2raw = wavfile.read("clip2.wav"); m2raw = m2raw.astype(float);
@@ -41,10 +42,9 @@ plot_spectrum(m2raw, fs, 8000, "Clip 2 Raw Waveform")
 
 # Band-limit each message to [0, W] using ideal_lowpass and normalize each by its peak magnitude
 m1 = ideal_lowpass(m1raw, fs, W)
-
 m1 = m1 / np.max(np.abs(m1))
-m2 = ideal_lowpass(m2raw, fs, W)
 
+m2 = ideal_lowpass(m2raw, fs, W)
 m2 = m2 / np.max(np.abs(m2))
 
 # Show each spectrum after band-limiting
@@ -70,21 +70,27 @@ x = c1 + c2
 plot_spectrum(x, fs, 20000, "Transmitted Signal x(t) Waveform")
 
 # Task 2.1
+# Define r1 and r2
 t = np.arange(len(x)) / fs
 r1 = x * np.cos(2 * np.pi * f1 * t)
 r2 = x * np.cos(2 * np.pi * f2 * t)
+
+# Plot r1 and r2
 plot_spectrum(r1, fs, 20000, "Received Signal r1(t) Waveform")
 plot_spectrum(r2, fs, 20000, "Received Signal r1(t) Waveform")
 
 # Task 3.1
+# Define m1hat and m2hat
 m1hat = 2 * ideal_lowpass(r1, fs, W)
 m2hat = 2 * ideal_lowpass(r2, fs, W)
 
+# Save m1hat and m2hat
 m1hat_i16 = np.int16(m1hat * 32767)
 wavfile.write("reconstructed_clip1.wav", round(fs), m1hat_i16)
 m2hat_i16 = np.int16(m2hat * 32767)
 wavfile.write("reconstructed_clip2.wav", round(fs), m2hat_i16)
 
+# Plot first 20ms of m1hat and m1
 t = np.arange(len(m1)) / fs
 ms = 20
 n = int(fs * ms / 1000)
@@ -98,6 +104,8 @@ plt.ylabel("Volume")
 plt.tight_layout()
 plt.savefig("m1_and_m1hat_Waveforms")
 
+# Task 3.2
+# Calculate RMS for modulations of x1 and cos(wt) for different phase shifts
 for phi in [0, 30, 60, 90]:
     y1 = x * np.cos(2 * np.pi * f1 * t + phi * (np.pi / 180))
-    print(f"For phi = {phi} degrees, y1 = {float(np.sqrt(np.mean(y1 ** 2)))}")
+    print(f"For phi = {phi} degrees, RMS of y1 = {float(np.sqrt(np.mean(y1 ** 2)))}")

@@ -63,7 +63,7 @@ t = np.arange(len(m1)) / fs
 c1 = m1 * np.cos(2 * np.pi * f1 * t)
 
 t = np.arange(len(m2)) / fs
-c2 = m1 * np.cos(2 * np.pi * f2 * t)
+c2 = m2 * np.cos(2 * np.pi * f2 * t)
 
 # Plot x(t)
 x = c1 + c2
@@ -72,4 +72,32 @@ plot_spectrum(x, fs, 20000, "Transmitted Signal x(t) Waveform")
 # Task 2.1
 t = np.arange(len(x)) / fs
 r1 = x * np.cos(2 * np.pi * f1 * t)
-plot_spectrum(r1, fs, 20000, "Received Signal r(t) Waveform")
+r2 = x * np.cos(2 * np.pi * f2 * t)
+plot_spectrum(r1, fs, 20000, "Received Signal r1(t) Waveform")
+plot_spectrum(r2, fs, 20000, "Received Signal r1(t) Waveform")
+
+# Task 3.1
+m1hat = 2 * ideal_lowpass(r1, fs, W)
+m2hat = 2 * ideal_lowpass(r2, fs, W)
+
+m1hat_i16 = np.int16(m1hat * 32767)
+wavfile.write("reconstructed_clip1.wav", round(fs), m1hat_i16)
+m2hat_i16 = np.int16(m2hat * 32767)
+wavfile.write("reconstructed_clip2.wav", round(fs), m2hat_i16)
+
+t = np.arange(len(m1)) / fs
+ms = 20
+n = int(fs * ms / 1000)
+plt.figure(figsize=(7, 3))
+plt.plot(t[:n] * 1000, m1[:n], label = "m1")
+plt.plot(t[:n] * 1000, m1hat[:n], label = "m1hat")
+plt.legend()
+plt.title("First 20 ms of m1 and m1hat")
+plt.xlabel("Time (ms)")
+plt.ylabel("Volume")
+plt.tight_layout()
+plt.savefig("m1_and_m1hat_Waveforms")
+
+for phi in [0, 30, 60, 90]:
+    y1 = x * np.cos(2 * np.pi * f1 * t + phi * (np.pi / 180))
+    print(f"For phi = {phi} degrees, y1 = {float(np.sqrt(np.mean(y1 ** 2)))}")

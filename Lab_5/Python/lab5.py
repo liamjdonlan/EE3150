@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
+from scipy.signal import fftconvolve
 
 # Define constants
 fs = 44100
@@ -109,3 +110,56 @@ plt.savefig("m1_and_m1hat_Waveforms")
 for phi in [0, 30, 60, 90]:
     y1 = x * np.cos(2 * np.pi * f1 * t + phi * (np.pi / 180))
     print(f"For phi = {phi} degrees, RMS of y1 = {float(np.sqrt(np.mean(y1 ** 2)))}")
+
+# Task 4.1
+# Define RC circuit
+R1, C1 = 10e3, 10e-9; tau1 = R1*C1
+R2, C2 = 4.7e3, 10e-9; tau2 = R2*C2
+R4, R5 = 1e3, 4.7e3; G = 1
+
+def h(t): 
+    t = np.asarray(t, float)
+    y = np.zeros_like(t)
+    y = G/(tau1-tau2)*(np.exp(-t/tau1) - np.exp(-t/tau2))
+    y[t<=0] = 0.0
+    return y
+
+# Apply RC filter to messages
+t = np.arange(len(m1raw)) / fs
+m1RC = fftconvolve(m1raw, h(t) / fs)[:len(m1raw)]
+m1RC = m1RC / np.max(np.abs(m1RC))
+
+t = np.arange(len(m2raw)) / fs
+m2RC = fftconvolve(m2raw, h(t) / fs)[:len(m2raw)]
+m2RC = m2RC / np.max(np.abs(m2RC))
+
+# Module messages
+t = np.arange(len(m1RC)) / fs
+c1RC = m1RC * np.cos(2 * np.pi * f1 * t)
+
+t = np.arange(len(m2RC)) / fs
+c2RC = m2RC * np.cos(2 * np.pi * f2 * t)
+
+# Combine modulated signals
+xRC = c1RC + c2RC
+
+# Define received messages 
+r1RC = xRC * np.cos(2 * np.pi * f1 * t)
+r2RC = xRC * np.cos(2 * np.pi * f2 * t)
+
+# Demodulate messages
+t = np.arange(len(r1RC)) / fs
+m1RChat = 2 * fftconvolve(r1RC, h(t) / fs)[:len(r1RC)]
+
+t = np.arange(len(r2RC)) / fs
+m2RChat = 2 * fftconvolve(r2RC, h(t) / fs)[:len(r2RC)]
+
+# Save demodulated messages
+m1RChat_i16 = np.int16(m1RChat * 32767)
+wavfile.write("RC_reconstructed_clip1.wav", round(fs), m1RChat_i16)
+m2RChat_i16 = np.int16(m2RChat * 32767)
+wavfile.write("RC_reconstructed_clip2.wav", round(fs), m2RChat_i16)
+
+# Plot demodulated messages
+plot_spectrum(m1RChat, fs, 8000, "Clip 1 RC Reconstructed Waveform")
+plot_spectrum(m2RChat, fs, 8000, "Clip 2 RC Reconstructed Waveform")

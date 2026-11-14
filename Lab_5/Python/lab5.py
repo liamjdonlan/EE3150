@@ -161,5 +161,7 @@ m2RChat_i16 = np.int16(m2RChat * 32767)
 wavfile.write("RC_reconstructed_clip2.wav", round(fs), m2RChat_i16)
 
 # Plot demodulated messages
+plot_spectrum(m1hat, fs, 8000, "Clip 1 Reconstructed Waveform")
+plot_spectrum(m2hat, fs, 8000, "Clip 2 Reconstructed Waveform")
 plot_spectrum(m1RChat, fs, 8000, "Clip 1 RC Reconstructed Waveform")
 plot_spectrum(m2RChat, fs, 8000, "Clip 2 RC Reconstructed Waveform")

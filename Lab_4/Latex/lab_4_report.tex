@@ -8,8 +8,14 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{booktabs}
 \usepackage{float}
-\usepackage{minted}
 \usepackage{xcolor}
+\usepackage{listings}
+
+\definecolor{accent}{HTML}{31566B}
+\definecolor{muted}{HTML}{65717A}
+\definecolor{pale}{HTML}{F5F7F8}
+\definecolor{border}{HTML}{DCE2E6}
+\setcounter{secnumdepth}{0}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -21,12 +27,25 @@
 
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 
+\lstdefinestyle{python}{
+  language=Python,basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{accent}\bfseries,
+  commentstyle=\color{muted},stringstyle=\color{accent},
+  backgroundcolor=\color{pale},frame=single,rulecolor=\color{border},
+  breaklines=true,showstringspaces=false,tabsize=4,
+  columns=fullflexible,keepspaces=true,
+  xleftmargin=6pt,xrightmargin=6pt,framexleftmargin=6pt,
+  framexrightmargin=6pt,aboveskip=8pt,belowskip=8pt,
+  numbers=none,captionpos=b
+}
+\lstset{style=python}
+
 \begin{document}
 
 \begin{titlepage}
     \vspace*{2cm}
     \centering
-    {\huge Signals and System Lab 4\par}
+    {\huge Signals and Systems Lab 4\par}
     \vspace{0.5cm}
     {\large Liam Donlan, Colden Briggs, Eben Radocchia\par}
     \vspace{0.3cm}
@@ -41,7 +60,9 @@
 
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
-\todo{Add Introduction}
+
+The objective of this lab was to study how Fourier series coefficients affect the shape and sound of periodic signals. Different tones were built from different sets of harmonic coefficients, a square wave was passed through an RC filter, and a sine wave was clipped to compare the effects of linear filtering and nonlinear distortion.
+
 
 \section*{Part 1}
 \addcontentsline{toc}{section}{Part 1}
@@ -52,13 +73,7 @@
 \subsubsection*{Code}
 \addcontentsline{toc}{subsubsection}{Code}
 
-\begin{minted}[
-    frame=single,
-    framesep=2mm,
-    linenos,
-    breaklines,
-    breakanywhere
-    ]{python}
+\begin{lstlisting}[style=python]
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
@@ -74,7 +89,7 @@ def additive(t, f0, amps, fs):
     for m in range(len(amps)):
         k = m + 1
         if k*f0 < fs/2:
-            x = x + amps[m] * np.sin(2 * np.pi * k * f0 * t) # Complete: add the k-th harmonic, see Eq. (1) of the manual
+            x = x + amps[m] * np.sin(2 * np.pi * k * f0 * t)
     return x
 
 # only the fundamental is nonzero
@@ -101,33 +116,33 @@ for i in range(len(all_1k2)):
     all_1k2[i] = float((1/k) ** 2)
 
 tone_pure = additive(t, f0, pure, fs) 
-tone_pure = tone_pure / np.max(np.abs(tone_pure)) #normalize to [-1, 1]
+tone_pure = tone_pure / np.max(np.abs(tone_pure))  # normalize to [-1, 1]
 
 tone_odd_1k = additive(t, f0, odd_1k, fs)
-tone_odd_1k = tone_odd_1k / np.max(np.abs(tone_odd_1k)) #normalize to [-1, 1]
+tone_odd_1k = tone_odd_1k / np.max(np.abs(tone_odd_1k))  # normalize to [-1, 1]
 
 tone_all_1k = additive(t, f0, all_1k, fs)
-tone_all_1k = tone_all_1k / np.max(np.abs(tone_all_1k)) #normalize to [-1, 1]
+tone_all_1k = tone_all_1k / np.max(np.abs(tone_all_1k))  # normalize to [-1, 1]
 
 tone_all_1k2 = additive(t, f0, all_1k2, fs)
-tone_all_1k2 = tone_all_1k2 / np.max(np.abs(tone_all_1k2)) #normalize to [-1, 1]
+tone_all_1k2 = tone_all_1k2 / np.max(np.abs(tone_all_1k2))  # normalize to [-1, 1]
 
 #Write tones to files to playback and compare
-pure_i16 = np.int16(tone_pure / np.max(np.abs(tone_pure)) * 32767) # converts to 16 bit int for wav format
+pure_i16 = np.int16(tone_pure / np.max(np.abs(tone_pure)) * 32767)  # to 16-bit int
 fname = "pure.wav"
-wavfile.write(fname, round(fs), pure_i16) # writes the wav file to disk
+wavfile.write(fname, round(fs), pure_i16)  # write wav
 
-odd_1k_i16 = np.int16(tone_odd_1k / np.max(np.abs(tone_odd_1k)) * 32767) # converts to 16 bit int for wav format
+odd_1k_i16 = np.int16(tone_odd_1k / np.max(np.abs(tone_odd_1k)) * 32767)  # to 16-bit int
 fname = "odd_1k.wav"
-wavfile.write(fname, round(fs), odd_1k_i16) # writes the wav file to disk
+wavfile.write(fname, round(fs), odd_1k_i16)  # write wav
 
-all_1k_i16 = np.int16(tone_all_1k / np.max(np.abs(tone_all_1k)) * 32767) # converts to 16 bit int for wav format
+all_1k_i16 = np.int16(tone_all_1k / np.max(np.abs(tone_all_1k)) * 32767)  # to 16-bit int
 fname = "all_1k.wav"
-wavfile.write(fname, round(fs), all_1k_i16) # writes the wav file to disk
+wavfile.write(fname, round(fs), all_1k_i16)  # write wav
 
-all_1k2_i16 = np.int16(tone_all_1k2 / np.max(np.abs(tone_all_1k2)) * 32767) # converts to 16 bit int for wav format
+all_1k2_i16 = np.int16(tone_all_1k2 / np.max(np.abs(tone_all_1k2)) * 32767)  # to 16-bit int
 fname = "all_1k2.wav"
-wavfile.write(fname, round(fs), all_1k2_i16) # writes the wav file to disk
+wavfile.write(fname, round(fs), all_1k2_i16)  # write wav
 
 # Create k-axis to plot magnitudes against
 k = np.arange(1, 21)
@@ -147,7 +162,7 @@ ax1[1, 1].stem(k, all_1k2)
 ax1[1, 1].set_title(r'All Coefficient Magnitudes = $1/k^2$')
 fig1.supxlabel('k')
 fig1.supylabel('magnitude')
-fig1.tight_layout
+fig1.tight_layout()
 
 fig2, ax2 = plt.subplots(figsize=(10, 5))
 
@@ -165,28 +180,29 @@ ax2.legend()
 fig2.tight_layout()
 
 plt.show()
-\end{minted}
+\end{lstlisting}
 
-\subsection*{Plots}
+\subsubsection*{Plots}
 \addcontentsline{toc}{subsubsection}{Plots}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{Lab_4/Latex/Graphs/A_k_vs_k.png}
-    \caption{\(A_k\) as a Function of k for Each Tone}
+    \caption{$A_k$ as a Function of $k$ for Each Tone}
     \label{fig:A_k_vs_k}
 \end{figure}
 
-\subsection*{Brightness and Hollowness}
+\subsubsection*{Brightness and Hollowness}
+\addcontentsline{toc}{subsubsection}{Brightness and Hollowness}
 \begin{description}
   \item[\texttt{pure}:] Only the fundamental is nonzero, so there is no higher-frequency content. It sounds the least bright of the four, with a very smooth but dull overall sound.
   \item[\texttt{odd\_1k}:] Only the odd harmonics are nonzero, with amplitudes decaying as $1/k$. It sounds very bright, and also the hollowest of the four.
 
-  \item[\texttt{all\_1k}:] All harmonics are present, with amplitudes decaying as $1/k$. It sounds bright, but with a fuller sound compared to odd\_1k.
+  \item[\texttt{all\_1k}:] All harmonics are present, with amplitudes decaying as $1/k$. It sounds bright, but with a fuller sound compared to \texttt{odd\_1k}.
   \item[\texttt{all\_1k2}:] All harmonics are present, but the amplitudes decay as $1/k^2$, so the higher harmonics die out much sooner. It sounds mellower than the $1/k$ tones.
 \end{description}
 
-The brightest tones are the ones whose harmonic amplitudes decay as $1/k$ (\texttt{odd\_1k} and \texttt{all\_1k}), because they contain more high-frequency content. The pure tone has no high-frequency content, and in \texttt{all\_1k2} the $1/k^2$ decay makes the higher harmonics fall off much faster. Hollowness is more of a result of the harmonic pattern: the hollowest tone, \texttt{odd\_1k}, has only odd harmonics. Generally, tones built from only odd harmonics sound hollower than other tones (such as square waves).
+The brightest tones are the ones whose harmonic amplitudes decay as $1/k$ (\texttt{odd\_1k} and \texttt{all\_1k}), because they contain more high-frequency content. The pure tone has no high-frequency content, and in \texttt{all\_1k2} the $1/k^2$ decay makes the higher harmonics fall off much faster. Hollowness is more of a result of the harmonic pattern: the hollowest tone, \texttt{odd\_1k}, has only odd harmonics. Generally, tones built from only odd harmonics (such as square waves) sound hollower than other tones.
 
 \begin{figure}[H]
     \centering
@@ -195,7 +211,8 @@ The brightest tones are the ones whose harmonic amplitudes decay as $1/k$ (\text
     \label{fig:tones}
 \end{figure}
 
-\subsection*{Tone Shape}
+\subsubsection*{Tone Shape}
+\addcontentsline{toc}{subsubsection}{Tone Shape}
 \begin{description}
   \item[\texttt{pure}:] The \texttt{pure} tone looks like an ordinary sine wave, since it is built from the fundamental alone with no additional frequency content.
   \item[\texttt{odd\_1k}:] The \texttt{odd\_1k} tone looks like a square wave. This matches the Fourier series of a square wave, whose coefficients are zero for even harmonics and proportional to $1/k$ for odd harmonics.
@@ -203,7 +220,7 @@ The brightest tones are the ones whose harmonic amplitudes decay as $1/k$ (\text
   \item[\texttt{all\_1k2}:] The \texttt{all\_1k2} waveform appears to lie between a sawtooth and a pure sine wave, just as the magnitude plot of its coefficients lies between those of the sawtooth tone (\texttt{all\_1k}) and the pure tone (\texttt{pure}).
 \end{description}
 
-The pattern of coefficients determines the waveform's shape in two ways. First, which harmonics are present sets the overall profile: odd harmonics alone produce a square wave, while all harmonics with the same $1/k$ decay produce a sawtooth. Second, how fast the coefficient decays determines how sharp the features of the waveform are, with faster decaying coefficient leading to a smoother, more sine-like waveform. 
+The pattern of coefficients determines the waveform's shape in two ways. First, which harmonics are present sets the overall profile: odd harmonics alone produce a square wave, while all harmonics with the same $1/k$ decay produce a sawtooth. Second, how fast the coefficients decay determines how sharp the features of the waveform are, with faster-decaying coefficients leading to a smoother, more sine-like waveform. 
 
 \subsection*{Task 1.2}
 \addcontentsline{toc}{subsection}{Task 1.2}
@@ -211,31 +228,25 @@ The pattern of coefficients determines the waveform's shape in two ways. First, 
 \subsubsection*{Code}
 \addcontentsline{toc}{subsubsection}{Code}
 
-\begin{minted}[
-    frame=single,
-    framesep=2mm,
-    linenos,
-    breaklines,
-    breakanywhere
-    ]{python}
+\begin{lstlisting}[style=python]
 def envelope(t, t_a=0.01, tau_d=0.15):
     # returns t/t_a during the rise (t < t_a), exp decay afterwards
     return np.where(t < t_a, t/t_a, np.exp(-(t-t_a)/tau_d))
 
 tone_all_1k = additive(t, f0, all_1k, fs)
-tone_all_1k_envelope = tone_all_1k / np.max(np.abs(tone_all_1k)) * envelope(t) #normalize to [-1, 1], multiply by envelope
-tone_all_1k_click = tone_all_1k / np.max(np.abs(tone_all_1k)) * envelope(t, t_a=0) #normalize to [-1, 1], envelope with no rise
+tone_all_1k_envelope = tone_all_1k / np.max(np.abs(tone_all_1k)) * envelope(t)  # normalize, apply envelope
+tone_all_1k_click = tone_all_1k / np.max(np.abs(tone_all_1k)) * envelope(t, t_a=0)  # normalize, no-rise envelope
 
-all_1k_envelope_i16 = np.int16(tone_all_1k_envelope * 32767) # converts to 16 bit int for wav format
-wavfile.write("all_1k_envelope.wav", round(fs), all_1k_envelope_i16) # writes the wav file to disk
+all_1k_envelope_i16 = np.int16(tone_all_1k_envelope * 32767)  # to 16-bit int
+wavfile.write("all_1k_envelope.wav", round(fs), all_1k_envelope_i16)  # write wav
 
-all_1k_click_i16 = np.int16(tone_all_1k_click * 32767) # converts to 16 bit int for wav format
-wavfile.write("all_1k_click.wav", round(fs), all_1k_click_i16) # writes the wav file to disk
-\end{minted}
+all_1k_click_i16 = np.int16(tone_all_1k_click * 32767)  # to 16-bit int
+wavfile.write("all_1k_click.wav", round(fs), all_1k_click_i16)  # write wav
+\end{lstlisting}
 
 \subsubsection*{Comparison}
 \addcontentsline{toc}{subsubsection}{Comparison}
-Although the \texttt{all\_1k} tone is multiplied by two different envelopes, one with a gradual rise and one without, both resultant tones sound the same, and no click is audible, as the original tone is built entirely of unshifted sine waves, so the tone starts with zero amplitude for both envelopes.
+Although the \texttt{all\_1k} tone is multiplied by two different envelopes, one with a gradual rise and one without, both resulting tones sound the same, and no click is audible. This is because the original tone is built entirely from unshifted sine waves, so it starts at zero amplitude for both envelopes. For a tone that starts at a nonzero amplitude, such as one built from cosines, a click would be audible, since the sudden jump in amplitude would introduce high-frequency content.
 
 \subsection*{Task 1.3}
 \addcontentsline{toc}{subsection}{Task 1.3}
@@ -243,13 +254,7 @@ Although the \texttt{all\_1k} tone is multiplied by two different envelopes, one
 \subsubsection*{Code}
 \addcontentsline{toc}{subsubsection}{Code}
 
-\begin{minted}[
-    frame=single,
-    framesep=2mm,
-    linenos,
-    breaklines,
-    breakanywhere
-    ]{python}
+\begin{lstlisting}[style=python]
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
@@ -262,7 +267,7 @@ def additive(t, f0, amps, fs):
     for m in range(len(amps)):
         k = m + 1
         if k*f0 < fs/2:
-            x = x + amps[m] * np.sin(2 * np.pi * k * f0 * t) # Complete: add the k-th harmonic, see Eq. (1) of the manual
+            x = x + amps[m] * np.sin(2 * np.pi * k * f0 * t)
     return x
 
 def envelope(t, t_a=0.01, tau_d=0.15):
@@ -283,14 +288,14 @@ for name, duration in song:
 
 clip = np.concatenate(clip)
 clip = clip/np.max(np.abs(clip))
-clip_i16 = np.int16(clip * 32767) # converts to 16 bit int for wav format
-wavfile.write("clip.wav", round(fs), clip_i16) # writes the wav file to disk
-\end{minted}
+clip_i16 = np.int16(clip * 32767)  # to 16-bit int
+wavfile.write("clip.wav", round(fs), clip_i16)  # write wav
+\end{lstlisting}
 
 \subsubsection*{Description}
 \addcontentsline{toc}{subsubsection}{Description}
-The instrument's harmonic amplitudes $A_k$ were taken from a recording of an A3 (\SI{220}{\hertz}) note played on a piano. The resulting timbre does not sound that much like a piano, though it does have a pleasant timbre. The melody is still recognizable, as musical pitches all correspond to distinct fundamental frequencies, and playing back tones with specific fundamental frequencies for specified durations allows one to reconstruct most melodies.
-
+The instrument's harmonic amplitudes $A_k = [1,\ 1.3,\ 1,\ 0.9,\ 0,\ 0.65,\ 0.6]$ for $k = 1, \ldots, 7$ were taken from a recording of an A3 (\SI{220}{\hertz}) note played on a piano. The resulting timbre does not sound much like a piano, though it is pleasant. The melody is still recognizable, as musical pitches all correspond to distinct fundamental frequencies, and playing back tones with specific fundamental frequencies for specified durations allows one to reconstruct most melodies.
+\newpage
 \section*{Part 2}
 \addcontentsline{toc}{section}{Part 2}
 
@@ -300,13 +305,7 @@ The instrument's harmonic amplitudes $A_k$ were taken from a recording of an A3 
 \subsubsection*{Code}
 \addcontentsline{toc}{subsubsection}{Code}
 
-\begin{minted}[
-    frame=single,
-    framesep=2mm,
-    linenos,
-    breaklines,
-    breakanywhere
-    ]{python}
+\begin{lstlisting}[style=python]
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
@@ -319,7 +318,7 @@ T0 = 1.0/f0
 def xtilde(t, N):
     x = np.zeros_like(t)
     for n in range(1, N+1):
-        k = 2*n- 1
+        k = 2*n - 1
         x = x + 1/k * np.sin(k * w0 * t)
     return x * (4 * A)/np.pi
 
@@ -357,44 +356,196 @@ ax1.legend()
 
 fig1.tight_layout()
 plt.show()
-\end{minted}
+\end{lstlisting}
 
 \subsubsection*{Partial Sum Plot}
 \addcontentsline{toc}{subsubsection}{Partial Sum Plot}
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\linewidth]{Lab_4/Latex/Graphs/figure2.1_partial_sums.png}
-    \caption{Square wave plot, with truncated approximations for $N = 1, 3, 7, 49, 199$} over 1.5 periods.
+    \caption{Square wave plot, with truncated approximations for $N = 1, 3, 7, 49, 199$ over 1.5 periods.}
     \label{fig:truncated_square}
 \end{figure}
 
 \subsubsection*{Overshoot Measurement and Behavior}
 \addcontentsline{toc}{subsubsection}{Overshoot Measurement and Behavior}
-For a $N=49$, the peak value just after the jump is $1.1790$, exceeding $A=1$ by \SI{17.9}{\percent}, while for $N=199$, the peak value just after the jump is $1.1778$, exceeding $A=1$ by \SI{17.78}{\percent}. For both cases, the exceeded percentage is approximately the same, even though over four times as many harmonics were used for $N=199$. This shows the difficulty of representing a discontinuous signal with a finite number of harmonics, as it will not be possible to perfectly approximate the discontinuities.
+For $N=49$, the peak value just after the jump is $1.1790$, exceeding $A=1$ by \SI{17.90}{\percent}, while for $N=199$, the peak value just after the jump is $1.1778$, exceeding $A=1$ by \SI{17.78}{\percent}. For both cases, the exceeded percentage is approximately the same, even though over four times as many harmonics were used for $N=199$. This shows the difficulty of representing a discontinuous signal with a finite number of harmonics, as it will not be possible to perfectly approximate the discontinuities.
 
+\newpage
 \subsection*{Task 2.2}
 \addcontentsline{toc}{subsection}{Task 2.2}
 
 \subsubsection*{\(H(j\omega)\) Derivation}
 \addcontentsline{toc}{subsubsection}{\texorpdfstring{\(H(j\omega)\)}{H(jw)} Derivation}
-\todo{Add \(H(j\omega)\) Derivation}
+The hand derivation for Task 2.2 can be seen in Figure~\ref{handderv2.2}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{Lab_4/Part2/Hand_calc_2.2.pdf}
+    \caption{Hand Derivation for \(H(j\omega)\)}
+    \label{handderv2.2}
+\end{figure}
 
 \subsubsection*{Comparison with Labs 2 and 3 for Fourier-series Output}
 \addcontentsline{toc}{subsubsection}{Comparison with Labs 2 and 3 for Fourier-series Output}
-\todo{Add Comparison with Labs 2 and 3 for Fourier-series Output}
+
+In Lab 3, a cosine input to the two-stage RC cascade produced a cosine output whose steady-state magnitude and phase were
+\[
+M(\omega) = \frac{G}{\sqrt{1+(\omega\tau_1)^2}\,\sqrt{1+(\omega\tau_2)^2}},
+\qquad
+\phi(\omega) = -\tan^{-1}(\omega\tau_1) - \tan^{-1}(\omega\tau_2).
+\]
+The magnitude and phase of the frequency response derived here are
+\[
+|H(j\omega)| = \frac{G}{\sqrt{1+(\omega\tau_1)^2}\,\sqrt{1+(\omega\tau_2)^2}},
+\qquad
+\angle H(j\omega) = -\tan^{-1}(\omega\tau_1) - \tan^{-1}(\omega\tau_2),
+\]
+which are identical.
+
+The two results agree because they are two different ways of computing the same LTI system's output. In Lab 3, the output was found directly by convolving the cosine input with the impulse response, and the steady-state magnitude and phase were read off once the transient had decayed. Here, the eigenfunction property is used instead: an input $e^{j\omega t}$ produces the output $H(j\omega)\,e^{j\omega t}$. Since a cosine is a sum of two complex exponentials, its steady-state output is a cosine scaled by $|H(j\omega)|$ and shifted by $\angle H(j\omega)$. Because both methods describe the same system, they must give the same magnitude and phase.
+
+\newpage
+\subsubsection*{Code}
+\addcontentsline{toc}{subsubsection}{Code}
+\begin{lstlisting}
+A = 1.0
+f0 = 10.0
+w0 = 2*np.pi*f0
+T0 = 1.0/f0
+
+def square_wave(t, T):
+    sq = np.zeros_like(t)
+    for i in range(len(t)):
+        rem = t[i] % T
+        if rem < T/2:
+            sq[i] = A
+        else: 
+            sq[i] = -A
+    return sq
+
+tau1, tau2, G = 10e-3, 4.7e-3, 5.7
+def H(f):
+    jw = 1j*2*np.pi*f
+    return G / ((1 + jw*tau1) * (1 + jw*tau2))
+
+def y_fs(t, f0, N=99):
+    w0 = 2*np.pi*f0
+    y = np.zeros_like(t)
+    for k in range(1, 2*N, 2):
+        Hk = H(k*f0)
+        y = y + (4*A/(np.pi*k)) * np.abs(Hk) * np.sin(k*w0*t + np.angle(Hk))
+    return y
+
+def y_conv(f0, dt=5e-5):
+    nper = 6
+    t = np.arange(0, nper/f0, dt)
+    x = np.sign(np.sin(2*np.pi*f0*t)); x[x == 0] = 1
+    th = np.arange(0, 12*tau1, dt)
+    h = G/(tau1 - tau2) * (np.exp(-th/tau1) - np.exp(-th/tau2))
+    yc = np.convolve(x, h)[:len(t)] * dt
+    return t, yc
+
+# f0 = 10 Hz
+tc, yc = y_conv(10.0)
+
+fig2, ax2 = plt.subplots(figsize=(10, 5))
+ax2.plot(tc, yc, label='Convolution')
+ax2.plot(tc, y_fs(tc, 10.0), '--', label='Fourier series')
+ax2.set_title('Filtered Square Wave, f0 = 10 Hz')
+ax2.set_xlabel('t (s)')
+ax2.set_ylabel('amplitude')
+ax2.legend()
+fig2.tight_layout()
+
+#  f0 plots
+for f in [2, 10, 40]:
+    tt = np.arange(0, 2/f, 1/f/10000)
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(tt, square_wave(tt, 1/f), label='Input square wave')
+    ax.plot(tt, y_fs(tt, f), label='Filtered output')
+    ax.set_title(f'f0 = {f} Hz')
+    ax.set_xlabel('t (s)')
+    ax.set_ylabel('amplitude')
+    ax.legend()
+    fig.tight_layout()
+
+# values
+for f in [2, 10, 40]:
+    print(f'f0 = {f} Hz:', [round(abs(H(k*f)), 3) for k in [1, 3, 5, 7, 9]])
+
+plt.show()
+\end{lstlisting}
 
 \subsubsection*{Convolution Output \& Overlay}
-\addcontentsline{toc}{subsubsection}{Convolution Outupt \& Overlay}
-\todo{Add Convolution Output \& Overlay}
+\addcontentsline{toc}{subsubsection}{Convolution Output \& Overlay}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Lab_4/Part2/figure2.2_conv_vs_fouirer.png}
+    \caption{Convolution and Fourier series outputs at $f_0=\SI{10}{\hertz}$.}
+    \label{fig:conv_vs_fourier}
+\end{figure}
+
+
+The convolution output starts at zero because the input begins at $t=0$ with the circuit initially at rest. The Fourier series gives the steady-state output, so it starts at a different value. After the startup transient decays, the two curves overlap, confirming that both methods give approximately the same steady-state output.
+
 
 \subsubsection*{\(f_0\) Plots}
 \addcontentsline{toc}{subsubsection}{\texorpdfstring{\(f_0\)}{f0} Plots}
-\todo{Add \(f_0\) Plots}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Lab_4/Part2/figure2.2_f0_2Hz.png}
+    \caption{Input and filtered output at $f_0=\SI{2}{\hertz}$.}
+    \label{fig:filter_2Hz}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Lab_4/Part2/figure2.2_f0_10Hz.png}
+    \caption{Input and filtered output at $f_0=\SI{10}{\hertz}$.}
+    \label{fig:filter_10Hz}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Lab_4/Part2/figure2.2_f0_40Hz.png}
+    \caption{Input and filtered output at $f_0=\SI{40}{\hertz}$.}
+    \label{fig:filter_40Hz}
+\end{figure}
 
 \subsubsection*{Mathematical Explanation of Behavior}
 \addcontentsline{toc}{subsubsection}{Mathematical Explanation of Behavior}
-\todo{Add Mathematical Explanation of Behavior}
 
+Each input harmonic has amplitude $4A/(\pi k)$, so its output amplitude is
+\[
+B_k=\frac{4A}{\pi k}|H(jk\omega_0)|,
+\qquad k=1,3,5,\ldots.
+\]
+The gains for the first three odd harmonics are shown below.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{cccc}
+        \toprule
+        $f_0$ (Hz) & $|H(j\omega_0)|$ & $|H(j3\omega_0)|$ & $|H(j5\omega_0)|$ \\
+        \midrule
+        2  & 5.646 & 5.252 & 4.629 \\
+        10 & 4.629 & 1.999 & 0.969 \\
+        40 & 1.362 & 0.204 & 0.075 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Filter gains at the first three odd harmonics.}
+    \label{tab:harmonic_gains}
+\end{table}
+
+At \SI{2}{\hertz}, the first few harmonics have similar gains, so the output keeps much of its square wave shape with rounded transitions. The flat portions approach $\pm5.7$ because the circuit's DC gain is $G=5.7$.
+
+At \SI{10}{\hertz}, the third and fifth harmonics receive much less gain than the fundamental. This reduces the sharp transitions and makes the output smoother.
+
+At \SI{40}{\hertz}, the third and fifth harmonic gains are small compared with the fundamental gain, so the output is nearly sinusoidal. The phase shifts from $H(jk\omega_0)$ also cause the output to lag the input.
+
+The steady-state output contains only the odd harmonics already present in the input: $f_0,3f_0,5f_0,\ldots$. The LTI circuit changes their amplitudes and phases without creating new frequencies.
 \section*{Part 3}
 \addcontentsline{toc}{section}{Part 3}
 
@@ -403,51 +554,217 @@ For a $N=49$, the peak value just after the jump is $1.1790$, exceeding $A=1$ by
 
 \subsubsection*{Clipped Waveform Plot}
 \addcontentsline{toc}{subsubsection}{Clipped Waveform Plot}
-\todo{Add Clipped Waveform Plot}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Lab_4/part3/figure3.1_clipped_sine.png}
+    \caption{One period of the sine wave clipped at $L/A=0.9$, $0.5$, and $0.2$, with the unclipped sine for comparison.}
+    \label{fig:clipped_sine}
+\end{figure}
 
 \subsubsection*{Description}
 \addcontentsline{toc}{subsubsection}{Description}
-\todo{Add Description}
+
+As $L$ decreases, more of the sine wave is flattened at $+L$ and $-L$. As $L/A$ approaches zero, the normalized waveform $y(t)/L$ approaches a square wave with levels of $+1$ and $-1$.
 
 \subsection*{Task 3.2}
 \addcontentsline{toc}{subsection}{Task 3.2}
 
 \subsubsection*{Integrals}
 \addcontentsline{toc}{subsubsection}{Integrals}
-\todo{Add Two Integrals}
+
+Define $\theta=\omega_0t$ and $\theta_c=\arcsin(L/A)$. Splitting the coefficient integral where clipping begins gives
+\[
+C_k=\frac{4}{\pi}
+\left[
+A\int_0^{\theta_c}\sin\theta\sin(k\theta)\,d\theta
++
+L\int_{\theta_c}^{\pi/2}\sin(k\theta)\,d\theta
+\right],
+\qquad k \text{ odd}.
+\]
+
+The calculations below evaluate both integrals for $k=1$ and for odd $k\geq3$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[page=1,width=0.9\linewidth]{Lab_4/part3/Hand_calc_3.2.pdf}
+    \caption{Hand calculations for $k=1$.}
+    \label{fig:clip_calc_k1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[page=2,width=0.9\linewidth]{Lab_4/part3/Hand_calc_3.2.pdf}
+    \caption{Hand calculations for odd $k\geq3$.}
+    \label{fig:clip_calc_k3}
+\end{figure}
 
 \subsubsection*{\(C_1\) and \(C_k\) Values}
 \addcontentsline{toc}{subsubsection}{\texorpdfstring{\(C_1\)}{C1} and \texorpdfstring{\(C_k\)}{Ck} Values}
-\todo{Add \(C_1\) and \(C_k\) Values}
+
+For $C_1$,
+\[
+\boxed{
+C_1=\frac{2A}{\pi}
+\left[\theta_c+\sin\theta_c\cos\theta_c\right].
+}
+\]
+
+For the remaining odd harmonics,
+\[
+\begin{aligned}
+C_k &=
+\frac{2A}{\pi}
+\left[
+\frac{\sin((k-1)\theta_c)}{k-1}
+-
+\frac{\sin((k+1)\theta_c)}{k+1}
+\right] \\
+&\quad+\frac{4L}{\pi k}\cos(k\theta_c),
+\qquad k=3,5,7,\ldots.
+\end{aligned}
+\]
+
+The signal is odd, so its DC and cosine coefficients are zero. Its half-wave symmetry makes the even sine harmonics zero.
 
 \subsection*{Task 3.3}
 \addcontentsline{toc}{subsection}{Task 3.3}
 
 \subsubsection*{Clip\_Ck}
 \addcontentsline{toc}{subsubsection}{Clip\_Ck}
-\todo{Add Clip\_Ck}
+
+The function uses the expressions derived in Task 3.2, with $k=1$ handled separately.
+
+\begin{lstlisting}[style=python]
+def clip_Ck(k, A, L):
+    theta_c = np.arcsin(L/A) #get the angle
+
+    if k % 2 == 0: #even k
+        return 0.0
+
+    if k == 1: #when k = 1
+        return (2*A/np.pi) * (
+            theta_c + np.sin(theta_c)*np.cos(theta_c)
+        )
+
+    first = np.sin((k-1)*theta_c)/(k-1) #first part
+    second = np.sin((k+1)*theta_c)/(k+1) #second part
+
+    #when k is odd and not 1
+    return (2*A/np.pi)*(first - second) + \
+           (4*L/(np.pi*k))*np.cos(k*theta_c)
+\end{lstlisting}
 
 \subsubsection*{Severity Plot and Description}
 \addcontentsline{toc}{subsubsection}{Severity Plot and Description}
-\todo{Add Severity Plot and Description}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Lab_4/part3/figure3.3_effect_of_clipping.png}
+    \caption{Odd harmonic amplitudes for $L/A=0.9$, $0.5$, and $0.2$.}
+    \label{fig:clip_harmonics}
+\end{figure}
+
+As clipping becomes deeper, the fundamental amplitude decreases and the higher harmonics become stronger relative to the fundamental. This agrees with the flatter waveform seen in Task 3.1.
 
 \subsubsection*{Limits and Shape Identification}
 \addcontentsline{toc}{subsubsection}{Limits and Shape Identification}
-\todo{Add Limits and Shape Identification}
 
+As $L/A$ approaches $1$, clipping disappears and the output approaches the original sine wave:
+\[
+C_1\rightarrow A=1,
+\qquad
+C_k\rightarrow0,\quad k=3,5,7,\ldots.
+\]
+
+As $L/A$ approaches zero, the normalized coefficients approach
+\[
+\frac{C_k}{L}\rightarrow\frac{4}{\pi k},
+\qquad k=1,3,5,\ldots.
+\]
+
+The numerical checks below use $A=1$ and clipping ratios close to each limit.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{cccc}
+        \toprule
+        $k$ & $C_k$ at $L/A=0.999$ & $C_k/L$ at $L/A=0.001$ & $4/(\pi k)$ \\
+        \midrule
+        1  & 0.999962  & 1.273239 & 1.273240 \\
+        3  & 0.000038  & 0.424413 & 0.424413 \\
+        5  & -0.000038 & 0.254647 & 0.254648 \\
+        7  & 0.000038  & 0.181890 & 0.181891 \\
+        9  & -0.000037 & 0.141469 & 0.141471 \\
+        11 & 0.000037  & 0.115747 & 0.115749 \\
+        13 & -0.000037 & 0.097939 & 0.097942 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Numerical checks of the two clipping limits.}
+    \label{tab:clip_limits}
+\end{table}
+
+The second limit gives the coefficients of a unit-amplitude square wave. As seen in Task 3.1, severe clipping makes the signal stay near $+L$ and $-L$ for most of each period, so dividing by $L$ makes the waveform approach a square wave with levels of $+1$ and $-1$.
 \subsection*{Task 3.4}
 \addcontentsline{toc}{subsection}{Task 3.4}
 
+\subsubsection*{Code}
+\addcontentsline{toc}{subsubsection}{Code}
+\begin{lstlisting}
+import numpy as np
+from scipy.io import wavfile
+
+fs = 44100
+f0 = 220.0
+A = 1.0
+L = 0.5*A
+t = np.arange(0, 2.0, 1.0/fs)
+
+def envelope(t, t_a=0.01, tau_d=0.15):
+    #rise then decay
+    return np.where(t < t_a, t/t_a, np.exp(-(t-t_a)/tau_d))
+
+#make the sine
+tone_clean = A*np.sin(2*np.pi*f0*t)
+
+#clip the sine
+tone_clipped = np.clip(tone_clean, -L, L)
+
+#normalize and add the envelope
+tone_clean_envelope = tone_clean / np.max(np.abs(tone_clean)) * envelope(t, tau_d=0.5)
+tone_clipped_envelope = tone_clipped / np.max(np.abs(tone_clipped)) * envelope(t, tau_d=0.5)
+
+#save the clean tone
+clean_i16 = np.int16(tone_clean_envelope * 32767)
+wavfile.write("clean.wav", round(fs), clean_i16)
+
+#save the clipped tone
+clipped_i16 = np.int16(tone_clipped_envelope * 32767)
+wavfile.write("clipped.wav", round(fs), clipped_i16)   
+\end{lstlisting}
 \subsubsection*{Audio}
 \addcontentsline{toc}{subsubsection}{Audio}
-\todo{Add Audio}
+
+The clean sine and clipped sine were generated at \SI{220}{\hertz} with $A=1$, $L/A=0.5$, and a sampling rate of \SI{44100}{\hertz}. Both used the same envelope, with a rise time of \SI{0.01}{\second} and a decay constant of \SI{0.5}{\second}, and were saved as separate WAV files for comparison.
+
+The clean tone sounded smooth, while the clipped tone sounded brighter and buzzier at the same pitch. This difference comes from the higher odd harmonics shown in Task 3.3.
 
 \subsubsection*{LTI-vs-nonlinear Contrast}
 \addcontentsline{toc}{subsubsection}{LTI-vs-nonlinear Contrast}
-\todo{Add LTI-vs-nonlinear Contrast}
+
+The LTI circuit in Part 2 changes the amplitude and phase of each harmonic already present in the input, but it cannot create new frequencies. By the eigenfunction property, each complex exponential $e^{jk\omega_0 t}$ in the input appears in the output at the same frequency, scaled by $H(jk\omega_0)$, and by linearity the output to a sum of harmonics is the sum of their individual outputs. As a result, every input frequency maps only to itself. The clipping in Part 3, by contrast, is nonlinear, so there is no guarantee that each input frequency maps only to itself, and even a single sinusoid can come out as a non-sinusoidal waveform. This is why clipping produces the new odd harmonics seen in Task 3.3, which an LTI system could never generate.
 
 \section*{Conclusion}
 \addcontentsline{toc}{section}{Conclusion}
-\todo{Add Conclusion}
+
+This lab used Fourier series coefficients to study the shape, sound, and processing of periodic signals. In Part 1, tones were synthesized from chosen harmonic amplitudes, showing how the coefficients set both timbre and waveform shape. In Part 2, a square wave was approximated with a finite number of harmonics and filtered through the RC circuit, where the Fourier series and convolution outputs agreed once the startup transient decayed. In Part 3, clipping a sine wave produced new odd harmonics, and as the clipping became more severe, the normalized coefficients $C_k/L$ approached those of a unit-amplitude square wave.
+
+\begin{itemize}
+    \item Tones with the same fundamental frequency can sound different because their harmonic amplitudes are different. The tones with stronger higher harmonics sounded brighter.
+    \item Multiplying a tone by an envelope makes it sound more like a real instrument note. An abrupt onset can cause an audible click, because a sudden jump in amplitude introduces high-frequency content. Since our tones were built from sine harmonics, they already started at zero amplitude, so no click was heard. A tone built from cosines would start at its peak, and that jump would make the click audible.
+    \item Adding more terms to the square wave approximation narrowed the ringing near each jump, while the peak overshoot stayed close to \SI{18}{\percent} of $A$.
+    \item The RC filter changed the amplitudes and phases of the existing harmonics. Symmetric clipping added higher odd harmonics to the sine wave, which made the tone sound buzzier.
+\end{itemize}
 
 \end{document}

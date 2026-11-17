@@ -1,7 +1,9 @@
 \documentclass[11pt,a4paper]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,graphicx,float,booktabs,listings,fancyhdr}
+\usepackage{xcolor}
 \usepackage[hidelinks]{hyperref}
+\newcommand{\remaining}[1]{\par\noindent\textcolor{red}{Still needed: #1}\par}
 \setcounter{secnumdepth}{0}
 \setcounter{tocdepth}{2}
 \pagestyle{fancy}
@@ -31,6 +33,8 @@
 \newpage
 
 \section{Introduction}
+
+This lab studied how modulation sends two audio messages over one channel and how demodulation, filtering, and carrier phase affect their recovery.
 
 \section{Part 1: Multiplexing Two Messages}
 
@@ -104,6 +108,8 @@ save_audio("band-limited_clip2.wav", m2)
 \end{lstlisting}
 
 \subsubsection{Raw Spectra and Frequency Ranges}
+
+For both clips, appreciable energy lies approximately within 0--4000 Hz, strongest below 2000 Hz, with weak nonzero content continuing to 8000 Hz in the plotted range.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{Clip_1_Raw_Waveform.png}
@@ -116,6 +122,8 @@ save_audio("band-limited_clip2.wav", m2)
 \end{figure}
 
 \subsubsection{Band-Limited Spectra and Confirmation of the 2000 Hz Cutoff}
+
+Both filtered spectra show no visible energy above the 2000 Hz cutoff.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{Clip_1_Band-Limited_Waveform.png}
@@ -129,13 +137,21 @@ save_audio("band-limited_clip2.wav", m2)
 
 \subsubsection{Listening Comparison}
 
+\remaining{Listen to the raw and band-limited clips and add one sentence comparing their sound.}
+
 \subsection{Task 1.2: Modulate}
 
 \subsubsection{Derivation and Hand Sketch of \(X(j\omega)\)}
 
+\remaining{Derive $X(j\omega)$ using the multiplication property and add the hand sketch of the shifted message spectra.}
+
 \subsubsection{Frequency Band Edges}
 
+\remaining{Give the lower and upper band edges in Hz for all four shifted spectral copies.}
+
 \subsubsection{Carrier Spacing Condition and Verification}
+
+\remaining{Derive the carrier-spacing condition and check it using the given bandwidth and carrier frequencies.}
 
 \subsubsection{Code}
 \begin{lstlisting}
@@ -146,6 +162,8 @@ plot_spectrum(x, fs, 20000, "Transmitted Signal x(t) Waveform")
 \end{lstlisting}
 
 \subsubsection{Transmitted Spectrum and Comparison with Predicted Bands}
+
+The numerical spectrum shows two separate bands centered on the assigned carriers, matching the expected band locations without visible overlap.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{Transmitted_Signal_x(t)_Waveform.png}
@@ -154,6 +172,8 @@ plot_spectrum(x, fs, 20000, "Transmitted Signal x(t) Waveform")
 
 \subsubsection{Why One Scalar Signal Carries Both Messages}
 
+The messages occupy separate frequency bands, so they can be added into one signal and individually recovered by demodulation and filtering.
+
 \newpage
 \section{Part 2: Demodulation}
 
@@ -161,9 +181,17 @@ plot_spectrum(x, fs, 20000, "Transmitted Signal x(t) Waveform")
 
 \subsubsection{Four-Term Trigonometric Expansion}
 
+\remaining{Substitute the transmitted signal into $r_1(t)$ and use trigonometric identities to obtain the four-term expansion.}
+
 \subsubsection{Center Frequencies, Wanted and Unwanted Bands, and Lowest Unwanted Frequency}
 
+The baseband band is wanted, and the three higher-frequency bands are unwanted.
+
+\remaining{Give all four center frequencies in Hz and the lowest frequency among the unwanted bands.}
+
 \subsubsection{Fourier Multiplication-Property Derivation and Hand Sketch}
+
+\remaining{Derive and hand-sketch $R_1(j\omega)$ using the multiplication property and confirm its center frequencies match the trigonometric result.}
 
 \subsubsection{Code}
 \begin{lstlisting}
@@ -172,6 +200,8 @@ plot_spectrum(r1, fs, 20000, "Demodulated Channel 1 Spectrum")
 \end{lstlisting}
 
 \subsubsection{Demodulated Spectrum and Verification of the Four Bands}
+
+The numerical spectrum shows one band at baseband and three at higher frequencies, consistent with the demodulation prediction.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{Demodulated_Channel_1_Spectrum.png}
@@ -180,6 +210,8 @@ plot_spectrum(r1, fs, 20000, "Demodulated Channel 1 Spectrum")
 
 \subsubsection{Why the Wanted Message Is at Baseband}
 
+Mixing with the matching carrier shifts channel 1 to zero frequency, while channel 2 remains offset because its carrier frequency is different.
+
 \newpage
 \section{Part 3: Reconstruction with an Ideal Low-Pass Filter}
 
@@ -187,7 +219,11 @@ plot_spectrum(r1, fs, 20000, "Demodulated Channel 1 Spectrum")
 
 \subsubsection{Hand Sketch of the Bands and Ideal Filter Response}
 
+\remaining{Hand-sketch the four bands with labeled centers and widths, then overlay the ideal filter response with amplitude 2 and cutoff $W$.}
+
 \subsubsection{Graphical Prediction of the Recovered Message}
+
+\remaining{Use the convolution property to shade the surviving band and state the recovered message in terms of the original message.}
 
 \subsubsection{Code for Recovering Both Channels}
 \begin{lstlisting}
@@ -219,11 +255,19 @@ plt.close()
 
 \subsubsection{Waveform and Listening Comparison}
 
+The recovered and original waveforms nearly overlap, apart from a small mismatch near the start of the plotted segment.
+
+\remaining{Play both ideally recovered channels and add a short sound comparison with the band-limited messages.}
+
 \subsubsection{Explanation of Channel Separation}
+
+The ideal filter keeps the baseband message and removes the channel-2 bands because they lie above its cutoff.
 
 \subsection{Task 3.2: Phase Coherence}
 
 \subsubsection{Derivation of the Recovered Baseband Term}
+
+\remaining{Use the product-to-sum identity to derive the recovered baseband term for a phase-offset local carrier and show its phase dependence.}
 
 \subsubsection{Code}
 \begin{lstlisting}
@@ -257,6 +301,8 @@ for phi in [0, 30, 60, 90]:
 
 \subsubsection{The \(90^\circ\) Result and Receiver Carrier Requirements}
 
+At a $90^\circ$ phase offset, the desired baseband component cancels and the measured RMS is nearly zero, so the receiver needs a carrier matched in frequency and phase.
+
 \newpage
 \section{Part 4: Reconstruction with the Two-Stage RC Network}
 
@@ -271,9 +317,15 @@ for phi in [0, 30, 60, 90]:
 
 \subsubsection{Explanation of Frequency Response Differences}
 
+The ideal filter has a flat passband and an abrupt cutoff, while the RC response decreases gradually and attenuates some message frequencies.
+
 \subsubsection{Hand Sketches of RC Modulation and Demodulation}
 
+\remaining{Add hand sketches showing how RC filtering changes the modulation and demodulation spectra relative to the ideal chain, using the convolution and multiplication properties.}
+
 \subsubsection{Transmit Band Overlap, Partial Receive Rejection, and Channel Leakage}
+
+The RC transmit filter leaves high-frequency tails, so the modulated spectra overlap, and the receive filter only attenuates the unwanted bands, allowing channel 2 to leak into channel 1.
 
 \subsubsection{Code for the RC Impulse Response and Both Transmit and Receive Filters}
 \begin{lstlisting}
@@ -342,6 +394,8 @@ plot_spectrum(m2RChat, fs, 8000, "Clip 2 RC Reconstructed Waveform")
 
 \subsubsection{Listening Comparison with Both Ideal Recoveries and Channel 1 Intelligibility}
 
+\remaining{Listen to both RC recoveries, compare them with the ideal recoveries, and state whether the channel-1 message remains audible.}
+
 \subsubsection{RC and Ideal Recovered Magnitude Spectra up to 8 kHz}
 \begin{figure}[H]
     \centering
@@ -358,9 +412,15 @@ plot_spectrum(m2RChat, fs, 8000, "Clip 2 RC Reconstructed Waveform")
 
 \subsubsection{Explanation of Spectral Differences}
 
+Compared with the ideal recoveries, the RC recoveries have weaker upper message frequencies relative to low frequencies and residual peaks above 2000 Hz because the RC filter rolls off gradually.
+
 \subsubsection{Reducing Leakage by Changing Carrier Frequencies and RC Time Constants}
+
+Increase the carrier spacing and use larger RC time constants for stronger rejection, while allowing enough bandwidth to retain the messages.
 
 \newpage
 \section{Conclusion}
+
+Modulation placed two messages in separate frequency bands, and coherent demodulation with ideal filtering recovered them. Phase errors weakened recovery, while RC filtering attenuated higher message frequencies and allowed channel leakage.
 
 \end{document}

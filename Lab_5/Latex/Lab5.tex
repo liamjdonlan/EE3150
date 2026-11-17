@@ -1,0 +1,145 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+
+\setcounter{secnumdepth}{0}
+\setcounter{tocdepth}{2}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Signals \& Systems Lab 5}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{14.5pt}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    showstringspaces=false,
+    keepspaces=true,
+    columns=fullflexible
+}
+
+\begin{document}
+
+\begin{titlepage}
+    \vspace*{2cm}
+    \centering
+    {\huge Signals and Systems Lab 5\par}
+    \vspace{0.5cm}
+    {\Large Communication Systems: Amplitude Modulation and Demodulation\par}
+    \vspace{0.5cm}
+    {\large Liam Donlan, Colden Briggs, Eben Radocchia\par}
+    \vspace{0.3cm}
+    {\large \today\par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\section{Part 1: Multiplexing Two Messages}
+
+\subsection{Task 1.1: Band-Limit the Two Clips}
+
+\subsubsection{Code}
+
+\subsubsection{Raw Spectra and Frequency Ranges}
+
+\subsubsection{Band-Limited Spectra and Confirmation of the 2000 Hz Cutoff}
+
+\subsubsection{Listening Comparison}
+
+\subsection{Task 1.2: Modulate}
+
+\subsubsection{Derivation and Hand Sketch of \(X(j\omega)\)}
+
+\subsubsection{Frequency Band Edges}
+
+\subsubsection{Carrier Spacing Condition and Verification}
+
+\subsubsection{Code}
+
+\subsubsection{Transmitted Spectrum and Comparison with Predicted Bands}
+
+\subsubsection{Why One Scalar Signal Carries Both Messages}
+
+\newpage
+\section{Part 2: Demodulation}
+
+\subsection{Task 2.1: Demodulation}
+
+\subsubsection{Four-Term Trigonometric Expansion}
+
+\subsubsection{Center Frequencies, Wanted and Unwanted Bands, and Lowest Unwanted Frequency}
+
+\subsubsection{Fourier Multiplication-Property Derivation and Hand Sketch}
+
+\subsubsection{Code}
+
+\subsubsection{Demodulated Spectrum and Verification of the Four Bands}
+
+\subsubsection{Why the Wanted Message Is at Baseband}
+
+\newpage
+\section{Part 3: Reconstruction with an Ideal Low-Pass Filter}
+
+\subsection{Task 3.1: Recover Using a Low-Pass Filter}
+
+\subsubsection{Hand Sketch of the Bands and Ideal Filter Response}
+
+\subsubsection{Graphical Prediction of the Recovered Message}
+
+\subsubsection{Code for Recovering Both Channels}
+
+\subsubsection{20 ms Overlay of Original and Recovered Channel 1}
+
+\subsubsection{Waveform and Listening Comparison}
+
+\subsubsection{Explanation of Channel Separation}
+
+\subsection{Task 3.2: Phase Coherence}
+
+\subsubsection{Derivation of the Recovered Baseband Term}
+
+\subsubsection{Code}
+
+\subsubsection{RMS Table for \(0^\circ\), \(30^\circ\), \(60^\circ\), and \(90^\circ\), Compared with \(\cos\phi\)}
+
+\subsubsection{The \(90^\circ\) Result and Receiver Carrier Requirements}
+
+\newpage
+\section{Part 4: Reconstruction with the Two-Stage RC Network}
+
+\subsection{Task 4.1: The RC Network at Both Ends and Comparison}
+
+\subsubsection{RC and Ideal Frequency Response Overlay}
+
+\subsubsection{Explanation of Frequency Response Differences}
+
+\subsubsection{Hand Sketches of RC Modulation and Demodulation}
+
+\subsubsection{Transmit Band Overlap, Partial Receive Rejection, and Channel Leakage}
+
+\subsubsection{Code for the RC Impulse Response and Both Transmit and Receive Filters}
+
+\subsubsection{Listening Comparison with Both Ideal Recoveries and Channel 1 Intelligibility}
+
+\subsubsection{RC and Ideal Recovered Magnitude Spectra up to 8 kHz}
+
+\subsubsection{Explanation of Spectral Differences}
+
+\subsubsection{Reducing Leakage by Changing Carrier Frequencies and RC Time Constants}
+
+\newpage
+\section{Conclusion}
+
+\end{document}

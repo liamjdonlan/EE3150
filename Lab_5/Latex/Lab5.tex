@@ -1,32 +1,18 @@
-\documentclass[11pt, a4paper]{article}
-
+\documentclass[11pt,a4paper]{article}
 \usepackage[margin=1in]{geometry}
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{float}
-\usepackage{booktabs}
-\usepackage{listings}
-\usepackage{fancyhdr}
+\usepackage{amsmath,graphicx,float,booktabs,listings,fancyhdr}
 \usepackage[hidelinks]{hyperref}
-
 \setcounter{secnumdepth}{0}
 \setcounter{tocdepth}{2}
-
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[L]{Signals \& Systems Lab 5}
 \fancyfoot[C]{\thepage}
 \setlength{\headheight}{14.5pt}
-
-\lstset{
-    language=Python,
-    basicstyle=\ttfamily\footnotesize,
-    breaklines=true,
-    showstringspaces=false,
-    keepspaces=true,
-    columns=fullflexible
-}
-
+\lstset{language=Python,basicstyle=\ttfamily\footnotesize,
+    breaklines=true,showstringspaces=false,keepspaces=true,
+    columns=fullflexible,frame=single,tabsize=4}
+\graphicspath{{figures/}}
 \begin{document}
 
 \begin{titlepage}
@@ -51,10 +37,31 @@
 \subsection{Task 1.1: Band-Limit the Two Clips}
 
 \subsubsection{Code}
+\lstinputlisting{code/task11.py}
 
 \subsubsection{Raw Spectra and Frequency Ranges}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Clip_1_Raw_Waveform.png}
+    \caption{Magnitude spectrum of raw clip 1.}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Clip_2_Raw_Waveform.png}
+    \caption{Magnitude spectrum of raw clip 2.}
+\end{figure}
 
 \subsubsection{Band-Limited Spectra and Confirmation of the 2000 Hz Cutoff}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Clip_1_Band-Limited_Waveform.png}
+    \caption{Magnitude spectrum of clip 1 after ideal band-limiting.}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Clip_2_Band-Limited_Waveform.png}
+    \caption{Magnitude spectrum of clip 2 after ideal band-limiting.}
+\end{figure}
 
 \subsubsection{Listening Comparison}
 
@@ -67,8 +74,14 @@
 \subsubsection{Carrier Spacing Condition and Verification}
 
 \subsubsection{Code}
+\lstinputlisting{code/task12.py}
 
 \subsubsection{Transmitted Spectrum and Comparison with Predicted Bands}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Transmitted_Signal_x(t)_Waveform.png}
+    \caption{Magnitude spectrum of the transmitted signal \(x(t)\).}
+\end{figure}
 
 \subsubsection{Why One Scalar Signal Carries Both Messages}
 
@@ -84,8 +97,14 @@
 \subsubsection{Fourier Multiplication-Property Derivation and Hand Sketch}
 
 \subsubsection{Code}
+\lstinputlisting{code/task21.py}
 
 \subsubsection{Demodulated Spectrum and Verification of the Four Bands}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Demodulated_Channel_1_Spectrum.png}
+    \caption{Magnitude spectrum of \(r_1(t)=x(t)\cos(2\pi f_1t)\) before reconstruction.}
+\end{figure}
 
 \subsubsection{Why the Wanted Message Is at Baseband}
 
@@ -99,8 +118,14 @@
 \subsubsection{Graphical Prediction of the Recovered Message}
 
 \subsubsection{Code for Recovering Both Channels}
+\lstinputlisting{code/task31.py}
 
 \subsubsection{20 ms Overlay of Original and Recovered Channel 1}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{m1_and_m1hat_Waveforms.png}
+    \caption{The first 20 ms of band-limited \(m_1(t)\) and ideally reconstructed \(\hat m_1(t)\).}
+\end{figure}
 
 \subsubsection{Waveform and Listening Comparison}
 
@@ -111,8 +136,23 @@
 \subsubsection{Derivation of the Recovered Baseband Term}
 
 \subsubsection{Code}
+\lstinputlisting{code/task32.py}
 
-\subsubsection{RMS Table for \(0^\circ\), \(30^\circ\), \(60^\circ\), and \(90^\circ\), Compared with \(\cos\phi\)}
+\subsubsection{RMS Table Compared with \(\cos\phi\)}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{rrrr}
+        \toprule
+        \(\phi\) (degrees) & \(\cos\phi\) & Measured RMS & \(\operatorname{RMS}(m_1)|\cos\phi|\) \\
+        \midrule
+        0  & 1.0000 & 0.117306 & 0.117306 \\
+        30 & 0.8660 & 0.101590 & 0.101590 \\
+        60 & 0.5000 & 0.058653 & 0.058653 \\
+        90 & 0.0000 & \(2.19\times10^{-6}\) & 0 \\
+        \bottomrule
+    \end{tabular}
+    \caption{RMS of the reconstructed signal after ideal low-pass filtering and multiplication by 2.}
+\end{table}
 
 \subsubsection{The \(90^\circ\) Result and Receiver Carrier Requirements}
 
@@ -122,6 +162,11 @@
 \subsection{Task 4.1: The RC Network at Both Ends and Comparison}
 
 \subsubsection{RC and Ideal Frequency Response Overlay}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{RC_and_Ideal_Frequency_Response.png}
+    \caption{Magnitude responses of the two-stage RC network and the ideal low-pass filter with a 2000 Hz cutoff.}
+\end{figure}
 
 \subsubsection{Explanation of Frequency Response Differences}
 
@@ -130,10 +175,23 @@
 \subsubsection{Transmit Band Overlap, Partial Receive Rejection, and Channel Leakage}
 
 \subsubsection{Code for the RC Impulse Response and Both Transmit and Receive Filters}
+\lstinputlisting{code/task41.py}
 
 \subsubsection{Listening Comparison with Both Ideal Recoveries and Channel 1 Intelligibility}
 
 \subsubsection{RC and Ideal Recovered Magnitude Spectra up to 8 kHz}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Clip_1_Reconstructed_Waveform.png}
+    \includegraphics[width=0.9\linewidth]{Clip_1_RC_Reconstructed_Waveform.png}
+    \caption{Channel 1 recovered magnitude spectra for the ideal chain (top) and RC chain (bottom). Each spectrum is normalized to its own peak.}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Clip_2_Reconstructed_Waveform.png}
+    \includegraphics[width=0.9\linewidth]{Clip_2_RC_Reconstructed_Waveform.png}
+    \caption{Channel 2 recovered magnitude spectra for the ideal chain (top) and RC chain (bottom). Each spectrum is normalized to its own peak.}
+\end{figure}
 
 \subsubsection{Explanation of Spectral Differences}
 

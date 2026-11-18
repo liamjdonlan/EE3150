@@ -34,7 +34,7 @@
 
 \section{Introduction}
 
-This lab studied how modulation sends two audio messages over one channel and how demodulation, filtering, and carrier phase affect their recovery.
+The objective of this lab was to send two audio messages over one channel and recover them separately in Python. Each clip was limited to 2000 Hz, multiplied by a different carrier, and added to form the transmitted signal. The receiver used the matching carrier and a low-pass filter to recover each message. We compared the signal spectra, tested receiver phase errors, and replaced the ideal filters at both ends with a two-stage RC filter to study attenuation and leakage.
 
 \section{Part 1: Multiplexing Two Messages}
 
@@ -147,11 +147,26 @@ Both filtered spectra show no visible energy above the 2000 Hz cutoff.
 
 \subsubsection{Frequency Band Edges}
 
-\remaining{Give the lower and upper band edges in Hz for all four shifted spectral copies.}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{rrr}
+        \toprule
+        Center (Hz) & Lower edge (Hz) & Upper edge (Hz) \\
+        \midrule
+        $-12000$ & $-14000$ & $-10000$ \\
+        $-6000$  & $-8000$  & $-4000$ \\
+        $6000$   & $4000$   & $8000$ \\
+        $12000$  & $10000$  & $14000$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Frequency bands of the four shifted message copies.}
+\end{table}
 
 \subsubsection{Carrier Spacing Condition and Verification}
 
-\remaining{Derive the carrier-spacing condition and check it using the given bandwidth and carrier frequencies.}
+The carriers are 6000 Hz apart, each modulated channel is 4000 Hz wide, and the positive-frequency bands have a 2000 Hz gap, so they do not overlap.
+
+\remaining{Derive the general carrier-spacing condition from the band edges.}
 
 \subsubsection{Code}
 \begin{lstlisting}
@@ -163,7 +178,7 @@ plot_spectrum(x, fs, 20000, "Transmitted Signal x(t) Waveform")
 
 \subsubsection{Transmitted Spectrum and Comparison with Predicted Bands}
 
-The numerical spectrum shows two separate bands centered on the assigned carriers, matching the expected band locations without visible overlap.
+The plotted bands occupy 4000--8000 Hz and 10000--14000 Hz, centered at 6000 Hz and 12000 Hz, matching the predicted bands without visible overlap.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{Transmitted_Signal_x(t)_Waveform.png}
@@ -172,7 +187,7 @@ The numerical spectrum shows two separate bands centered on the assigned carrier
 
 \subsubsection{Why One Scalar Signal Carries Both Messages}
 
-The messages occupy separate frequency bands, so they can be added into one signal and individually recovered by demodulation and filtering.
+The messages occupy separate frequency bands, so adding them preserves both messages. The receiver moves the selected message to baseband and filters out the other bands, allowing each message to be recovered from the same transmitted signal.
 
 \newpage
 \section{Part 2: Demodulation}
@@ -185,9 +200,21 @@ The messages occupy separate frequency bands, so they can be added into one sign
 
 \subsubsection{Center Frequencies, Wanted and Unwanted Bands, and Lowest Unwanted Frequency}
 
-The baseband band is wanted, and the three higher-frequency bands are unwanted.
-
-\remaining{Give all four center frequencies in Hz and the lowest frequency among the unwanted bands.}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{rrrl}
+        \toprule
+        Center (Hz) & Lower edge (Hz) & Upper edge (Hz) & Band \\
+        \midrule
+        $0$     & $-2000$ & $2000$  & Wanted \\
+        $6000$  & $4000$  & $8000$  & Unwanted \\
+        $12000$ & $10000$ & $14000$ & Unwanted \\
+        $18000$ & $16000$ & $20000$ & Unwanted \\
+        \bottomrule
+    \end{tabular}
+    \caption{Demodulated bands listed by their nonnegative center frequencies.}
+\end{table}
+The lowest unwanted frequency is 4000 Hz, and the higher-frequency bands also have mirrored copies at negative frequencies.
 
 \subsubsection{Fourier Multiplication-Property Derivation and Hand Sketch}
 
@@ -201,7 +228,7 @@ plot_spectrum(r1, fs, 20000, "Demodulated Channel 1 Spectrum")
 
 \subsubsection{Demodulated Spectrum and Verification of the Four Bands}
 
-The numerical spectrum shows one band at baseband and three at higher frequencies, consistent with the demodulation prediction.
+The numerical spectrum shows bands centered at 0, 6000, 12000, and 18000 Hz, matching the predicted centers.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{Demodulated_Channel_1_Spectrum.png}
@@ -210,7 +237,7 @@ The numerical spectrum shows one band at baseband and three at higher frequencie
 
 \subsubsection{Why the Wanted Message Is at Baseband}
 
-Mixing with the matching carrier shifts channel 1 to zero frequency, while channel 2 remains offset because its carrier frequency is different.
+Mixing with the 6000 Hz carrier shifts channel 1 to baseband. Channel 2 instead appears in bands centered at 6000 Hz and 18000 Hz, so its bands remain above the 2000 Hz message cutoff.
 
 \newpage
 \section{Part 3: Reconstruction with an Ideal Low-Pass Filter}
@@ -223,7 +250,9 @@ Mixing with the matching carrier shifts channel 1 to zero frequency, while chann
 
 \subsubsection{Graphical Prediction of the Recovered Message}
 
-\remaining{Use the convolution property to shade the surviving band and state the recovered message in terms of the original message.}
+The ideal reconstruction gives $\hat m_1(t)=m_1(t)$, retaining the message band from $-2000$ to $2000$ Hz.
+
+\remaining{Use the convolution property to show the graphical prediction and shade the surviving band on the hand sketch.}
 
 \subsubsection{Code for Recovering Both Channels}
 \begin{lstlisting}
@@ -261,7 +290,7 @@ The recovered and original waveforms nearly overlap, apart from a small mismatch
 
 \subsubsection{Explanation of Channel Separation}
 
-The ideal filter keeps the baseband message and removes the channel-2 bands because they lie above its cutoff.
+The wanted message extends to 2000 Hz, while the nearest unwanted band starts at 4000 Hz. The ideal 2000 Hz low-pass filter therefore retains the message and rejects the channel-2 bands.
 
 \subsection{Task 3.2: Phase Coherence}
 
@@ -284,6 +313,8 @@ for phi in [0, 30, 60, 90]:
 \end{lstlisting}
 
 \subsubsection{RMS Table Compared with \(\cos\phi\)}
+
+The measured RMS follows the expected phase scaling, falling to about 86.6\% and 50.0\% of its zero-phase value at $30^\circ$ and $60^\circ$, and nearly zero at $90^\circ$.
 \begin{table}[H]
     \centering
     \begin{tabular}{rrrr}
@@ -301,7 +332,7 @@ for phi in [0, 30, 60, 90]:
 
 \subsubsection{The \(90^\circ\) Result and Receiver Carrier Requirements}
 
-At a $90^\circ$ phase offset, the desired baseband component cancels and the measured RMS is nearly zero, so the receiver needs a carrier matched in frequency and phase.
+At a $90^\circ$ phase offset, the desired baseband component cancels and the measured RMS is nearly zero. The receiver carrier must match the transmitter in frequency and phase to recover the message with its original amplitude.
 
 \newpage
 \section{Part 4: Reconstruction with the Two-Stage RC Network}
@@ -317,7 +348,7 @@ At a $90^\circ$ phase offset, the desired baseband component cancels and the mea
 
 \subsubsection{Explanation of Frequency Response Differences}
 
-The ideal filter has a flat passband and an abrupt cutoff, while the RC response decreases gradually and attenuates some message frequencies.
+The ideal filter passes the message band unchanged and removes frequencies above 2000 Hz. The RC response decreases gradually, so it attenuates upper message frequencies and leaves some unwanted content above 2000 Hz.
 
 \subsubsection{Hand Sketches of RC Modulation and Demodulation}
 
@@ -325,7 +356,7 @@ The ideal filter has a flat passband and an abrupt cutoff, while the RC response
 
 \subsubsection{Transmit Band Overlap, Partial Receive Rejection, and Channel Leakage}
 
-The RC transmit filter leaves high-frequency tails, so the modulated spectra overlap, and the receive filter only attenuates the unwanted bands, allowing channel 2 to leak into channel 1.
+At the transmitter, the RC filter leaves spectral tails above 2000 Hz, so the shifted message spectra overlap. At the receiver, the RC filter only partly rejects the unwanted channel-2 band. Some channel-2 content therefore remains in the channel-1 recovery.
 
 \subsubsection{Code for the RC Impulse Response and Both Transmit and Receive Filters}
 \begin{lstlisting}
@@ -412,15 +443,15 @@ plot_spectrum(m2RChat, fs, 8000, "Clip 2 RC Reconstructed Waveform")
 
 \subsubsection{Explanation of Spectral Differences}
 
-Compared with the ideal recoveries, the RC recoveries have weaker upper message frequencies relative to low frequencies and residual peaks above 2000 Hz because the RC filter rolls off gradually.
+The RC recoveries have weaker upper message frequencies relative to low frequencies because the messages pass through RC filters at both ends. They also contain residual peaks above 2000 Hz because the receive filter does not fully remove the unwanted bands. The ideal recovered spectra stop at 2000 Hz.
 
 \subsubsection{Reducing Leakage by Changing Carrier Frequencies and RC Time Constants}
 
-Increase the carrier spacing and use larger RC time constants for stronger rejection, while allowing enough bandwidth to retain the messages.
+Increase the carrier spacing to move the unwanted bands farther from the wanted band. Larger RC time constants strengthen rejection but also attenuate more of the message, so enough bandwidth must remain to retain it.
 
 \newpage
 \section{Conclusion}
 
-Modulation placed two messages in separate frequency bands, and coherent demodulation with ideal filtering recovered them. Phase errors weakened recovery, while RC filtering attenuated higher message frequencies and allowed channel leakage.
+We band-limited two audio clips, placed them on separate carriers, combined them, and reconstructed both channels. The transmitted bands had a 2000 Hz gap, allowing the ideal receiver filter to separate the messages. The recovered channel-1 waveform closely matched the band-limited original. Receiver phase errors reduced the recovered amplitude, with almost no recovery at a $90^\circ$ offset. Replacing the transmit and receive filters with RC filters attenuated upper message frequencies and left unwanted spectral content. The main takeaways are that carrier spacing prevents band overlap, receiver phase controls recovery, and filter selectivity determines how well unwanted signals are rejected.
 
 \end{document}

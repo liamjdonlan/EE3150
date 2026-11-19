@@ -35,7 +35,7 @@ fig1, ax1 = plt.subplots(figsize=(10, 5))
 
 #Plot partial sum approximations for differnet partial sum lengths
 for n in N:
-    ax1.plot(t, xtilde(t, n), label=f'xtilde with N = {n}')
+    ax1.plot(t, xtilde(t, n), label=rf'$\tilde{{x}}_N$, $N = {n}$')
 
 peak_N49 = np.max(xtilde(t, 49))
 ax1.axhline(peak_N49, linestyle='--', color='gray', label=f'N=49 peak = {peak_N49:.4f}')

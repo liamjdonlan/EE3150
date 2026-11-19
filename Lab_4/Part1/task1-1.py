@@ -74,7 +74,7 @@ k = np.arange(1, 21)
 # plot A_k as a function of k for each tone
 fig1, ax1 = plt.subplots(2, 2, sharex=True, sharey=True, figsize = (10, 7))
 
-fig1.suptitle('A_k as a function of k for each tone')
+fig1.suptitle(r'$A_k$ as a function of $k$ for each tone')
 
 ax1[0, 0].stem(k, pure)
 ax1[0, 0].set_title('Pure Tone Coefficients')

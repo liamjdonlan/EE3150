@@ -49,8 +49,8 @@ N = min(len(m1raw), len(m2raw))
 m1raw, m2raw = m1raw[:N], m2raw[:N]
 t = np.arange(N) / fs
 
-plot_spectrum(m1raw, fs, 8000, "Clip 1 Raw Waveform")
-plot_spectrum(m2raw, fs, 8000, "Clip 2 Raw Waveform")
+plot_spectrum(m1raw, fs, 8000, "Clip 1 Raw Spectrun")
+plot_spectrum(m2raw, fs, 8000, "Clip 2 Raw Spectrum ")
 
 m1 = ideal_lowpass(m1raw, fs, W)
 m1 = m1 / np.max(np.abs(m1))

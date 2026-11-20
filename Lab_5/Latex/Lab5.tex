@@ -14,7 +14,7 @@
 \lstset{language=Python,basicstyle=\ttfamily\footnotesize,
     breaklines=true,showstringspaces=false,keepspaces=true,
     columns=fullflexible,tabsize=4}
-\graphicspath{{Lab_5/Python/}{Python/}{../Python/}}
+\graphicspath{{Lab_5/Python/}{Python/}{../Python/}{Lab_5/Sketches/}{Sketches/}{../Sketches/}}
 \begin{document}
 
 \begin{titlepage}
@@ -143,7 +143,12 @@ Both filtered spectra show no visible energy above the 2000 Hz cutoff.
 
 \subsubsection{Derivation and Hand Sketch of \(X(j\omega)\)}
 
-\remaining{Derive $X(j\omega)$ using the multiplication property and add the hand sketch of the shifted message spectra.}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{sketch_1_2_X.png}
+    \caption{Derivation of \(X(j\omega)\) using the multiplication property and hand sketch of the four shifted message copies.}
+    \label{fig:sketch-1-2-X}
+\end{figure}
 
 \subsubsection{Frequency Band Edges}
 
@@ -166,7 +171,12 @@ Both filtered spectra show no visible energy above the 2000 Hz cutoff.
 
 The carriers are 6000 Hz apart, each modulated channel is 4000 Hz wide, and the positive-frequency bands have a 2000 Hz gap, so they do not overlap.
 
-\remaining{Derive the general carrier-spacing condition from the band edges.}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{sketch_1_2_condition.png}
+    \caption{Band edges of each shifted copy and derivation of the carrier-spacing condition \(f_2-f_1>2W\).}
+    \label{fig:sketch-1-2-condition}
+\end{figure}
 
 \subsubsection{Code}
 \begin{lstlisting}
@@ -196,7 +206,12 @@ The messages occupy separate frequency bands, so adding them preserves both mess
 
 \subsubsection{Four-Term Trigonometric Expansion}
 
-\remaining{Substitute the transmitted signal into $r_1(t)$ and use trigonometric identities to obtain the four-term expansion.}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{sketch_2_1_trig.png}
+    \caption{Four-term trigonometric expansion of \(r_1(t)=x(t)\cos(2\pi f_1 t)\).}
+    \label{fig:sketch-2-1-trig}
+\end{figure}
 
 \subsubsection{Center Frequencies, Wanted and Unwanted Bands, and Lowest Unwanted Frequency}
 
@@ -218,7 +233,12 @@ The lowest unwanted frequency is 4000 Hz, and the higher-frequency bands also ha
 
 \subsubsection{Fourier Multiplication-Property Derivation and Hand Sketch}
 
-\remaining{Derive and hand-sketch $R_1(j\omega)$ using the multiplication property and confirm its center frequencies match the trigonometric result.}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{sketch_2_1_R1.png}
+    \caption{Hand sketch of \(X(j\omega)\) (top) and \(R_1(j\omega)\) (bottom), with band centers at 0, \(\pm6\), \(\pm12\), and \(\pm18\) kHz.}
+    \label{fig:sketch-2-1-R1}
+\end{figure}
 
 \subsubsection{Code}
 \begin{lstlisting}
@@ -246,13 +266,23 @@ Mixing with the 6000 Hz carrier shifts channel 1 to baseband. Channel 2 instead 
 
 \subsubsection{Hand Sketch of the Bands and Ideal Filter Response}
 
-\remaining{Hand-sketch the four bands with labeled centers and widths, then overlay the ideal filter response with amplitude 2 and cutoff $W$.}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{sketch_3_1_filter.png}
+    \caption{Bands of \(R_1(j\omega)\) with the ideal low-pass response \(2H\) (red, cutoff \(W\)) overlaid; the shaded band survives the product.}
+    \label{fig:sketch-3-1-filter}
+\end{figure}
 
 \subsubsection{Graphical Prediction of the Recovered Message}
 
 The ideal reconstruction gives $\hat m_1(t)=m_1(t)$, retaining the message band from $-2000$ to $2000$ Hz.
 
-\remaining{Use the convolution property to show the graphical prediction and shade the surviving band on the hand sketch.}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{sketch_3_1_prediction.png}
+    \caption{Graphical prediction: \(\hat M_1(j\omega)=2H(j\omega)R_1(j\omega)=M_1(j\omega)\), so \(\hat m_1(t)=m_1(t)\).}
+    \label{fig:sketch-3-1-prediction}
+\end{figure}
 
 \subsubsection{Code for Recovering Both Channels}
 \begin{lstlisting}
@@ -296,7 +326,12 @@ The wanted message extends to 2000 Hz, while the nearest unwanted band starts at
 
 \subsubsection{Derivation of the Recovered Baseband Term}
 
-\remaining{Use the product-to-sum identity to derive the recovered baseband term for a phase-offset local carrier and show its phase dependence.}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{sketch_3_2_phase.png}
+    \caption{Derivation of the recovered baseband term \(m_1(t)\cos\phi\) for a phase-offset local carrier.}
+    \label{fig:sketch-3-2-phase}
+\end{figure}
 
 \subsubsection{Code}
 \begin{lstlisting}
@@ -352,7 +387,18 @@ The ideal filter passes the message band unchanged and removes frequencies above
 
 \subsubsection{Hand Sketches of RC Modulation and Demodulation}
 
-\remaining{Add hand sketches showing how RC filtering changes the modulation and demodulation spectra relative to the ideal chain, using the convolution and multiplication properties.}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{sketch_4_1_transmit.png}
+    \caption{Transmit side: message spectrum after the ideal and RC filters, and the resulting overlap of the shifted copies in \(X(j\omega)\).}
+    \label{fig:sketch-4-1-transmit}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{sketch_4_1_receive.png}
+    \caption{Receive side: \(R_1(j\omega)\) with the RC filter (red) overlaid, and the recovered \(\hat M_1(j\omega)\) showing attenuation near \(W\) and channel-2 leakage.}
+    \label{fig:sketch-4-1-receive}
+\end{figure}
 
 \subsubsection{Transmit Band Overlap, Partial Receive Rejection, and Channel Leakage}
 

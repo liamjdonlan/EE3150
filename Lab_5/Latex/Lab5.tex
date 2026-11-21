@@ -93,16 +93,16 @@ N = min(len(m1raw), len(m2raw))
 m1raw, m2raw = m1raw[:N], m2raw[:N]
 t = np.arange(N) / fs
 
-plot_spectrum(m1raw, fs, 8000, "Clip 1 Raw Waveform")
-plot_spectrum(m2raw, fs, 8000, "Clip 2 Raw Waveform")
+plot_spectrum(m1raw, fs, 8000, "Clip 1 Raw Spectrum")
+plot_spectrum(m2raw, fs, 8000, "Clip 2 Raw Spectrum")
 
 m1 = ideal_lowpass(m1raw, fs, W)
 m1 = m1 / np.max(np.abs(m1))
 m2 = ideal_lowpass(m2raw, fs, W)
 m2 = m2 / np.max(np.abs(m2))
 
-plot_spectrum(m1, fs, 8000, "Clip 1 Band-Limited Waveform")
-plot_spectrum(m2, fs, 8000, "Clip 2 Band-Limited Waveform")
+plot_spectrum(m1, fs, 8000, "Clip 1 Band-Limited Spectrum")
+plot_spectrum(m2, fs, 8000, "Clip 2 Band-Limited Spectrum")
 save_audio("band-limited_clip1.wav", m1)
 save_audio("band-limited_clip2.wav", m2)
 \end{lstlisting}
@@ -112,12 +112,12 @@ save_audio("band-limited_clip2.wav", m2)
 For both clips, appreciable energy lies approximately within 0--4000 Hz, strongest below 2000 Hz, with weak nonzero content continuing to 8000 Hz in the plotted range.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{Clip_1_Raw_Waveform.png}
+    \includegraphics[width=0.9\linewidth]{Clip_1_Raw_Spectrum.png}
     \caption{Magnitude spectrum of raw clip 1.}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{Clip_2_Raw_Waveform.png}
+    \includegraphics[width=0.9\linewidth]{Clip_2_Raw_Spectrum.png}
     \caption{Magnitude spectrum of raw clip 2.}
 \end{figure}
 
@@ -126,12 +126,12 @@ For both clips, appreciable energy lies approximately within 0--4000 Hz, stronge
 Both filtered spectra show no visible energy above the 2000 Hz cutoff.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{Clip_1_Band-Limited_Waveform.png}
+    \includegraphics[width=0.9\linewidth]{Clip_1_Band-Limited_Spectrum.png}
     \caption{Magnitude spectrum of clip 1 after ideal band-limiting.}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{Clip_2_Band-Limited_Waveform.png}
+    \includegraphics[width=0.9\linewidth]{Clip_2_Band-Limited_Spectrum.png}
     \caption{Magnitude spectrum of clip 2 after ideal band-limiting.}
 \end{figure}
 
@@ -158,10 +158,10 @@ The band-limited clips sound muffled compared to the raw clips, though the messa
         \toprule
         Band & Center (Hz) & Lower edge (Hz) & Upper edge (Hz) \\
         \midrule
-        $M_{1,1}$ & $-12000$ & $-14000$ & $-10000$ \\
+        $M_{2,2}$ & $-12000$ & $-14000$ & $-10000$ \\
         $M_{1,2}$ & $-6000$  & $-8000$  & $-4000$ \\
-        $M_{2,1}$ & $6000$   & $4000$   & $8000$ \\
-        $M_{2,2}$ & $12000$  & $10000$  & $14000$ \\
+        $M_{1,1}$ & $6000$   & $4000$   & $8000$ \\
+        $M_{2,1}$ & $12000$  & $10000$  & $14000$ \\
         \bottomrule
     \end{tabular}
     \caption{Frequency bands of the four shifted message copies.}
@@ -183,7 +183,7 @@ The carriers are 6000 Hz apart, each modulated channel is 4000 Hz wide, and the 
 c1 = np.cos(2 * np.pi * f1 * t)
 c2 = np.cos(2 * np.pi * f2 * t)
 x = m1 * c1 + m2 * c2
-plot_spectrum(x, fs, 20000, "Transmitted Signal x(t) Waveform")
+plot_spectrum(x, fs, 20000, "Transmitted Signal x(t) Spectrum")
 \end{lstlisting}
 
 \subsubsection{Transmitted Spectrum and Comparison with Predicted Bands}
@@ -191,7 +191,7 @@ plot_spectrum(x, fs, 20000, "Transmitted Signal x(t) Waveform")
 The plotted bands occupy 4000--8000 Hz and 10000--14000 Hz, centered at 6000 Hz and 12000 Hz, matching the predicted bands without visible overlap.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{Transmitted_Signal_x(t)_Waveform.png}
+    \includegraphics[width=0.9\linewidth]{Transmitted_Signal_x(t)_Spectrum.png}
     \caption{Magnitude spectrum of the transmitted signal \(x(t)\).}
 \end{figure}
 
@@ -463,27 +463,27 @@ m2RChat = 2 * fftconvolve(r2RC, kernel)[:N]
 save_audio("RC_reconstructed_clip1.wav", m1RChat)
 save_audio("RC_reconstructed_clip2.wav", m2RChat)
 
-plot_spectrum(m1hat, fs, 8000, "Clip 1 Reconstructed Waveform")
-plot_spectrum(m2hat, fs, 8000, "Clip 2 Reconstructed Waveform")
-plot_spectrum(m1RChat, fs, 8000, "Clip 1 RC Reconstructed Waveform")
-plot_spectrum(m2RChat, fs, 8000, "Clip 2 RC Reconstructed Waveform")
+plot_spectrum(m1hat, fs, 8000, "Clip 1 Reconstructed Spectrum")
+plot_spectrum(m2hat, fs, 8000, "Clip 2 Reconstructed Spectrum")
+plot_spectrum(m1RChat, fs, 8000, "Clip 1 RC Reconstructed Spectrum")
+plot_spectrum(m2RChat, fs, 8000, "Clip 2 RC Reconstructed Spectrum")
 \end{lstlisting}
 
 \subsubsection{Listening Comparison with Both Ideal Recoveries and Channel 1 Intelligibility}
 
-The RC-chain recovered messages are less muffled than the ideal-chain recovered messages. However, in both reconstructed messages, the other message is also  audible in the background, though somewhat distorted.
+The RC-chain recovered messages are less muffled than the ideal-chain recovered messages. However, in both reconstructed messages, the other message is also  audible in the background, though somewhat distorted, though the primary messages are still easily discernible. 
 
 \subsubsection{RC and Ideal Recovered Magnitude Spectra up to 8 kHz}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{Clip_1_Reconstructed_Waveform.png}
-    \includegraphics[width=0.9\linewidth]{Clip_1_RC_Reconstructed_Waveform.png}
+    \includegraphics[width=0.9\linewidth]{Clip_1_Reconstructed_Spectrum.png}
+    \includegraphics[width=0.9\linewidth]{Clip_1_RC_Reconstructed_Spectrum.png}
     \caption{Channel 1 recovered magnitude spectra for the ideal chain (top) and RC chain (bottom). Each spectrum is normalized to its own peak.}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{Clip_2_Reconstructed_Waveform.png}
-    \includegraphics[width=0.9\linewidth]{Clip_2_RC_Reconstructed_Waveform.png}
+    \includegraphics[width=0.9\linewidth]{Clip_2_Reconstructed_Spectrum.png}
+    \includegraphics[width=0.9\linewidth]{Clip_2_RC_Reconstructed_Spectrum.png}
     \caption{Channel 2 recovered magnitude spectra for the ideal chain (top) and RC chain (bottom). Each spectrum is normalized to its own peak.}
 \end{figure}
 

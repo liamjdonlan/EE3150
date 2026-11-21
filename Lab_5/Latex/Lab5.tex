@@ -137,7 +137,7 @@ Both filtered spectra show no visible energy above the 2000 Hz cutoff.
 
 \subsubsection{Listening Comparison}
 
-\remaining{Listen to the raw and band-limited clips and add one sentence comparing their sound.}
+The band-limited clips sound muffled compared to the raw clips, though the messages are still easily discernible. Additionally, there is a high frequency pitch audible in the band-limited clips, especially during pauses in the message.
 
 \subsection{Task 1.2: Modulate}
 
@@ -154,14 +154,14 @@ Both filtered spectra show no visible energy above the 2000 Hz cutoff.
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{rrr}
+    \begin{tabular}{lrrr}
         \toprule
-        Center (Hz) & Lower edge (Hz) & Upper edge (Hz) \\
+        Band & Center (Hz) & Lower edge (Hz) & Upper edge (Hz) \\
         \midrule
-        $-12000$ & $-14000$ & $-10000$ \\
-        $-6000$  & $-8000$  & $-4000$ \\
-        $6000$   & $4000$   & $8000$ \\
-        $12000$  & $10000$  & $14000$ \\
+        $M_{1,1}$ & $-12000$ & $-14000$ & $-10000$ \\
+        $M_{1,2}$ & $-6000$  & $-8000$  & $-4000$ \\
+        $M_{2,1}$ & $6000$   & $4000$   & $8000$ \\
+        $M_{2,2}$ & $12000$  & $10000$  & $14000$ \\
         \bottomrule
     \end{tabular}
     \caption{Frequency bands of the four shifted message copies.}
@@ -173,7 +173,7 @@ The carriers are 6000 Hz apart, each modulated channel is 4000 Hz wide, and the 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\linewidth]{sketch_1_2_condition.png}
+    \includegraphics[width=0.7\linewidth]{sketch_1_2_condition.png}
     \caption{Band edges of each shifted copy and derivation of the carrier-spacing condition \(f_2-f_1>2W\).}
     \label{fig:sketch-1-2-condition}
 \end{figure}
@@ -316,7 +316,7 @@ plt.close()
 
 The recovered and original waveforms nearly overlap, apart from a small mismatch near the start of the plotted segment.
 
-\remaining{Play both ideally recovered channels and add a short sound comparison with the band-limited messages.}
+The band-limited and ideally recovered signals sound identical, when played back, for both channels.
 
 \subsubsection{Explanation of Channel Separation}
 
@@ -471,7 +471,7 @@ plot_spectrum(m2RChat, fs, 8000, "Clip 2 RC Reconstructed Waveform")
 
 \subsubsection{Listening Comparison with Both Ideal Recoveries and Channel 1 Intelligibility}
 
-\remaining{Listen to both RC recoveries, compare them with the ideal recoveries, and state whether the channel-1 message remains audible.}
+The RC-chain recovered messages are less muffled than the ideal-chain recovered messages. However, in both reconstructed messages, the other message is also  audible in the background, though somewhat distorted.
 
 \subsubsection{RC and Ideal Recovered Magnitude Spectra up to 8 kHz}
 \begin{figure}[H]

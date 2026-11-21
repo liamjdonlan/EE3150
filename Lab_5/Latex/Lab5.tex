@@ -34,7 +34,7 @@
 
 \section{Introduction}
 
-The objective of this lab was to send two audio messages over one channel and recover them separately in Python. Each clip was limited to 2000 Hz, multiplied by a different carrier, and added to form the transmitted signal. The receiver used the matching carrier and a low-pass filter to recover each message. We compared the signal spectra, tested receiver phase errors, and replaced the ideal filters at both ends with a two-stage RC filter to study attenuation and leakage.
+The objective of this lab was to send two audio messages over one channel and recover them separately in Python. Each clip was limited to 2000 Hz, multiplied by a different carrier, and added to form the transmitted signal. The receiver used the matching carrier and a low-pass filter to recover each message. We compared the signal spectra, tested receiver phase errors, and replaced the ideal filters at both ends with a two-stage RC filter to study attenuation and leakage. As a bonus, we also implemented standard AM, which transmits the carrier along with the message, and recovered the message with an envelope detector that requires no local carrier.
 
 \section{Part 1: Multiplexing Two Messages}
 
@@ -569,11 +569,11 @@ save_audio("recovered_rectified.wav", rect)
 
 \subsubsection{Envelope and Transmitted Signal}
 
-\remaining{report the printed value of min(env) and confirm it is positive.}
+The minimum of the envelope is $\min(1 + \mu m_1) = 0.3 > 0$, so the envelope never goes negative and $s(t)$ is not overmodulated. 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{Envelope_and_Transmitted_Signal.png}
+    \includegraphics[width=0.9\linewidth]{12ms_segment.png}
     \caption{A 12 ms segment of the standard-AM signal \(s(t)\) and its envelope \(\pm(1+\mu m_1(t))\), starting at the loudest sample of \(m_1\).}
 \end{figure}
 
@@ -607,17 +607,21 @@ The rectified spectrum shows the baseband copy at 0 and the copy at $2f_c = 1200
     \caption{Magnitude spectrum of the envelope-detected signal after low-pass filtering and DC removal.}
 \end{figure}
 
-\remaining{one or two sentences comparing the recovered audio with m1.}
+The recovered rectified audio is slightly muffled compared to m1, though the message is still discernible. Additionally, similar to Part 1, there is a high frequency pitch audible in the background, especially during pauses in the message.
 
 \subsubsection{Carrier Phase and Overmodulation}
 
-\remaining{one line on why the envelope detector works with unknown carrier phase, contrasted with Task 3.2.}
+The envelope detector works with unknown carrier phase, as the receiver never generates its own carrier and as a result does not have to match phase with the transmitter. In Task 3.2, on the other hand, the receiver generated its own carrier, which had to match the phase of the transmitter to recover the message without attenuation. 
 
-\remaining{what happens when $\mu$ is raised until min$(1+\mu m_1) < 0$, and why.}
+If $\mu$ is raised until $\min(1 + \mu m_1) < 0$, the signal becomes overmodulated. The factorization used in Task 5.1 then no longer holds, because
+\[
+|s(t)| = \left|1 + \mu m_n(t)\right| \, |\cos\omega_c t| \neq \left[1 + \mu m_n(t)\right] |\cos\omega_c t|
+\]
+wherever the envelope is negative. The low-pass filter therefore recovers $\frac{2}{\pi}\left|1 + \mu m_n(t)\right|$ instead of $\frac{2}{\pi}\left[1 + \mu m_n(t)\right]$. The negative portions of the envelope are converted to positive values, so subtracting the DC term no longer leaves a scaled copy of $m_n$, and the recovered message is distorted.
 
 \newpage
 \section{Conclusion}
 
-We band-limited two audio clips, placed them on separate carriers, combined them, and reconstructed both channels. The transmitted bands had a 2000 Hz gap, allowing the ideal receiver filter to separate the messages. The recovered channel-1 waveform closely matched the band-limited original. Receiver phase errors reduced the recovered amplitude, with almost no recovery at a $90^\circ$ offset. Replacing the transmit and receive filters with RC filters attenuated upper message frequencies and left unwanted spectral content. The main takeaways are that carrier spacing prevents band overlap, receiver phase controls recovery, and filter selectivity determines how well unwanted signals are rejected.
+We band-limited two audio clips, placed them on separate carriers, combined them, and reconstructed both channels. The transmitted bands had a 2000 Hz gap, allowing the ideal receiver filter to separate the messages. The recovered channel-1 waveform closely matched the band-limited original. Receiver phase errors reduced the recovered amplitude, with almost no recovery at a $90^\circ$ offset. Replacing the transmit and receive filters with RC filters attenuated upper message frequencies and left unwanted spectral content. For the bonus, standard AM with $\mu = 0.7$ kept the envelope positive (minimum 0.3), and rectifying, low-pass filtering, and removing the DC term recovered the message without a local carrier, at the cost of transmitting power in the carrier itself. The main takeaways are that carrier spacing prevents band overlap, receiver phase controls recovery, filter selectivity determines how well unwanted signals are rejected, and standard AM trades power efficiency for a simpler receiver that is insensitive to carrier phase but requires $\mu \le 1$ to avoid overmodulation.
 
 \end{document}

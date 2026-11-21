@@ -57,15 +57,15 @@ m1 = m1 / np.max(np.abs(m1))
 m2 = ideal_lowpass(m2raw, fs, W)
 m2 = m2 / np.max(np.abs(m2))
 
-plot_spectrum(m1, fs, 8000, "Clip 1 Band-Limited Waveform")
-plot_spectrum(m2, fs, 8000, "Clip 2 Band-Limited Waveform")
+plot_spectrum(m1, fs, 8000, "Clip 1 Band-Limited Spectrum")
+plot_spectrum(m2, fs, 8000, "Clip 2 Band-Limited Spectrum")
 save_audio("band-limited_clip1.wav", m1)
 save_audio("band-limited_clip2.wav", m2)
 
 c1 = np.cos(2 * np.pi * f1 * t)
 c2 = np.cos(2 * np.pi * f2 * t)
 x = m1 * c1 + m2 * c2
-plot_spectrum(x, fs, 20000, "Transmitted Signal x(t) Waveform")
+plot_spectrum(x, fs, 20000, "Transmitted Signal x(t) Spectrum")
 
 r1 = x * np.cos(2 * np.pi * f1 * t)
 plot_spectrum(r1, fs, 20000, "Demodulated Channel 1 Spectrum")
@@ -156,7 +156,7 @@ m2RChat = 2 * fftconvolve(r2RC, kernel)[:N]
 save_audio("RC_reconstructed_clip1.wav", m1RChat)
 save_audio("RC_reconstructed_clip2.wav", m2RChat)
 
-plot_spectrum(m1hat, fs, 8000, "Clip 1 Reconstructed Waveform")
-plot_spectrum(m2hat, fs, 8000, "Clip 2 Reconstructed Waveform")
-plot_spectrum(m1RChat, fs, 8000, "Clip 1 RC Reconstructed Waveform")
-plot_spectrum(m2RChat, fs, 8000, "Clip 2 RC Reconstructed Waveform")
+plot_spectrum(m1hat, fs, 8000, "Clip 1 Reconstructed Spectrum")
+plot_spectrum(m2hat, fs, 8000, "Clip 2 Reconstructed Spectrum")
+plot_spectrum(m1RChat, fs, 8000, "Clip 1 RC Reconstructed Spectrum")
+plot_spectrum(m2RChat, fs, 8000, "Clip 2 RC Reconstructed Spectrum")

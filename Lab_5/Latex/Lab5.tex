@@ -477,7 +477,7 @@ plot_spectrum(m2RChat, fs, 8000, "Clip 2 RC Reconstructed Spectrum")
 
 \subsubsection{Listening Comparison with Both Ideal Recoveries and Channel 1 Intelligibility}
 
-The RC-chain recovered messages are less muffled than the ideal-chain recovered messages. However, in both reconstructed messages, the other message is also  audible in the background, though somewhat distorted, though the primary messages are still easily discernible. 
+The RC-chain recovered messages are less muffled than the ideal-chain recovered messages. However, in both reconstructed messages, the other message is also  audible in the background, though somewhat distorted, but the primary messages are still easily discernible. 
 
 \subsubsection{RC and Ideal Recovered Magnitude Spectra up to 8 kHz}
 \begin{figure}[H]
@@ -495,11 +495,125 @@ The RC-chain recovered messages are less muffled than the ideal-chain recovered 
 
 \subsubsection{Explanation of Spectral Differences}
 
-The RC recoveries have weaker upper message frequencies relative to low frequencies because the messages pass through RC filters at both ends. They also contain residual peaks above 2000 Hz because the receive filter does not fully remove the unwanted bands. The ideal recovered spectra stop at 2000 Hz.
+The RC recoveries have weaker upper message frequencies (near 2000 Hz) relative to low frequencies, because the messages pass through RC filters at both ends. However, the gradual roll-off also lets some 2–4 kHz content through, whereas the ideal filter removes everything above 2000 Hz. This is why the RC recoveries sound less muffled, and it also explains the residual channel-2 peaks above 2000 Hz.
 
 \subsubsection{Reducing Leakage by Changing Carrier Frequencies and RC Time Constants}
 
-Increase the carrier spacing to move the unwanted bands farther from the wanted band. Larger RC time constants strengthen rejection but also attenuate more of the message, so enough bandwidth must remain to retain it.
+Increasing the carrier spacing would move the unwanted bands farther from the wanted band, causing leakage to be smaller. Larger RC time constants strengthen rejection but also attenuate more of the message, so enough bandwidth must remain to retain it.
+
+\newpage
+\section{Part 5 (Bonus): Standard AM and Envelope Detection}
+
+\subsection{Task 5.1: AM Spectra by Hand}
+
+\subsubsection{Spectrum of \(s(t)\)}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{sketch_5_1_S.png}
+    \caption{Multiplication-property derivation of \(S(j\omega)\) and hand sketch showing the carrier impulses (area \(\pi\)) at \(\pm f_c\) and the message copies centered on them.}
+    \label{fig:sketch-5-1-S}
+\end{figure}
+
+The spectrum consists of carrier impulses at $\pm f_c$ plus copies of the message spectrum, scaled by $\mu/2$, centered at $\pm f_c$. For a message band-limited to $W$, the occupied bands are $(-f_c - W,\ -f_c + W)$ and $(f_c - W,\ f_c + W)$ Hz, each of width $(f_c + W) - (f_c - W) = 2W = 4$ kHz.
+
+\subsubsection{Spectrum of the Rectified Signal}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{sketch_5_1_rect.png}
+    \caption{Spectrum of \(|s(t)|\) using the Fourier series of \(|\cos\omega_c t|\): a baseband copy of \(\frac{2}{\pi}[1+\mu m_n(t)]\) at 0, plus copies centered at \(\pm 2f_c, \pm 4f_c, \ldots\)}
+    \label{fig:sketch-5-1-rect}
+\end{figure}
+
+The first unwanted copy is centered at $2f_c$, so its lowest frequency is $2f_c - W$. This copy stays out of the low-pass passband $[0, W]$ as long as $2f_c - W > W$, i.e.\ $f_c > W$. This is slightly stricter than $W < 2f_c$, which only keeps the center of the copy above the cutoff. Under this condition there is no overlap, and an ideal low-pass filter with cutoff $W$ passes only the baseband copy, $\frac{2}{\pi}\left[1 + \mu m_n(t)\right]$. Subtracting its DC term $\frac{2}{\pi}$ leaves $\frac{2}{\pi}\mu\, m_n(t)$, a scaled copy of the message.
+
+\subsection{Task 5.2: Build Standard AM in Python}
+
+\subsubsection{Code}
+The code below reuses \texttt{plot\_spectrum}, \texttt{ideal\_lowpass}, \texttt{save\_audio}, and the band-limited, normalized \texttt{m1} from Task 1.1.
+\begin{lstlisting}
+fc = 6000
+mu = 0.7
+
+env = 1 + mu * m1                          # envelope
+s = env * np.cos(2 * np.pi * fc * t)       # transmitted signal
+print("min(env) =", np.min(env))
+
+n = int(fs * 0.012)
+i0 = np.argmax(np.abs(m1))                 # start at the loudest sample
+seg = slice(i0, i0 + n)
+plt.figure(figsize=(7, 3))
+plt.plot(t[seg] * 1000, env[seg], label="envelope", color="tab:blue")
+plt.plot(t[seg] * 1000, -env[seg], color="tab:blue")
+plt.plot(t[seg] * 1000, s[seg], label="s(t)", lw=0.6, color="tab:red")
+plt.xlabel("Time (ms)")
+plt.ylabel("Amplitude")
+plt.title("12 ms of env and s(t)")
+plt.legend()
+plt.tight_layout()
+plt.savefig("Envelope_and_Transmitted_Signal.png")
+plt.close()
+
+plot_spectrum(s, fs, 10000, "Transmitted Signal s(t) Spectrum")
+
+rect = np.abs(s)                           # rectify
+plot_spectrum(rect, fs, 20000, "Rectified Signal Spectrum")
+
+rect = ideal_lowpass(rect, fs, W)          # keep only the baseband copy
+rect = rect - 2 / np.pi                    # remove DC offset
+rect = rect / np.max(np.abs(rect))         # normalize
+plot_spectrum(rect, fs, 20000, "Recovered Rectified Signal Spectrum")
+save_audio("recovered_rectified.wav", rect)
+\end{lstlisting}
+
+\subsubsection{Envelope and Transmitted Signal}
+
+\remaining{report the printed value of min(env) and confirm it is positive.}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Envelope_and_Transmitted_Signal.png}
+    \caption{A 12 ms segment of the standard-AM signal \(s(t)\) and its envelope \(\pm(1+\mu m_1(t))\), starting at the loudest sample of \(m_1\).}
+\end{figure}
+
+The peaks of $s(t)$ follow the envelope $1 + \mu m_1(t)$, so the envelope traces the message.
+
+\subsubsection{Transmitted Spectrum}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Transmitted_Signal_s(t)_Spectrum.png}
+    \caption{Magnitude spectrum of the standard-AM signal \(s(t)\).}
+\end{figure}
+
+The spectrum matches the Task 5.1 sketch: a carrier line at 6000 Hz with message sidebands between 4000 and 8000 Hz. Because the carrier is a pure sinusoid, its energy is concentrated in a single frequency and dominates the normalized plot, while the sidebands appear small. This shows that much of the transmitted power is spent on the carrier, which carries no information.
+
+\subsubsection{Rectified Spectrum}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Rectified_Signal_Spectrum.png}
+    \caption{Magnitude spectrum of the rectified signal \(|s(t)|\) before low-pass filtering.}
+\end{figure}
+
+The rectified spectrum shows the baseband copy at 0 and the copy at $2f_c = 12000$ Hz predicted in Task 5.1. The 12 kHz peak is about $1/3$ the height of the DC peak, matching the ratio $1/(4k^2-1)$ for $k=1$ from the Fourier series of $|\cos\omega_c t|$. The smaller peaks near 3.9, 8.1, 15.9, and 16.2 kHz are higher harmonics ($8f_c$, $6f_c$, $10f_c$, $12f_c$) aliased by the 44.1 kHz sampling rate. All of them lie above $W$, so the low-pass filter removes them.
+
+\subsubsection{Recovered Spectrum and Listening Comparison}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Recovered_Rectified_Signal_Spectrum.png}
+    \caption{Magnitude spectrum of the envelope-detected signal after low-pass filtering and DC removal.}
+\end{figure}
+
+\remaining{one or two sentences comparing the recovered audio with m1.}
+
+\subsubsection{Carrier Phase and Overmodulation}
+
+\remaining{one line on why the envelope detector works with unknown carrier phase, contrasted with Task 3.2.}
+
+\remaining{what happens when $\mu$ is raised until min$(1+\mu m_1) < 0$, and why.}
 
 \newpage
 \section{Conclusion}

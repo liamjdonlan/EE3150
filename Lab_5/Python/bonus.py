@@ -50,6 +50,8 @@ m1 = m1 / np.max(np.abs(m1))
 env = 1 + mu*m1 #envelope
 s = env * np.cos(2 * np.pi * fc * t) #transmitted signal
 
+print(np.min(env))
+
 n = int(fs * 0.012)
 
 plt.figure(figsize=(7, 3))
@@ -57,7 +59,6 @@ plt.figure(figsize=(7, 3))
 i0 = np.argmax(np.abs(m1))      
 seg = slice(i0, i0 + n)
 plt.plot(t[seg] * 1000, env[seg], label="envelope", color="tab:blue")
-plt.plot(t[seg] * 1000, -env[seg], color="tab:blue")
 plt.plot(t[seg] * 1000, s[seg], label="s(t)", lw=0.6, color="tab:red")
 plt.xlabel("Time (ms)")
 plt.ylabel("Amplitude")

@@ -49,8 +49,8 @@ N = min(len(m1raw), len(m2raw))
 m1raw, m2raw = m1raw[:N], m2raw[:N]
 t = np.arange(N) / fs
 
-plot_spectrum(m1raw, fs, 8000, "Clip 1 Raw Spectrun")
-plot_spectrum(m2raw, fs, 8000, "Clip 2 Raw Spectrum ")
+plot_spectrum(m1raw, fs, 8000, "Clip 1 Raw Spectrum")
+plot_spectrum(m2raw, fs, 8000, "Clip 2 Raw Spectrum")
 
 m1 = ideal_lowpass(m1raw, fs, W)
 m1 = m1 / np.max(np.abs(m1))
@@ -85,7 +85,7 @@ plt.ylabel("Amplitude")
 plt.title("First 20 ms of m1 and m1hat")
 plt.legend()
 plt.tight_layout()
-plt.savefig("m1_and_m1hat_Waveforms.png")
+plt.savefig("m1_and_m1hat_Spectrums.png")
 plt.close()
 
 rms_m1 = float(np.sqrt(np.mean(m1 ** 2)))
